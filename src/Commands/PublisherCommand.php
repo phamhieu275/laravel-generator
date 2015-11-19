@@ -70,7 +70,7 @@ class PublisherCommand extends Command
      */
     public function publishTemplates()
     {
-        $templatesPath = __DIR__.'/../../../../templates';
+        $templatesPath = __DIR__.'/../../templates';
 
         $templatesCopyPath = base_path('resources/generator-templates');
 
@@ -82,7 +82,7 @@ class PublisherCommand extends Command
      */
     public function publishCommonViews()
     {
-        $viewsPath = __DIR__.'/../../../../views/common';
+        $viewsPath = __DIR__.'/../../views/common';
 
         $viewsCopyPath = base_path('resources/views/common');
 

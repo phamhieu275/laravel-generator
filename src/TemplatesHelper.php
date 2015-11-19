@@ -7,7 +7,7 @@ class TemplatesHelper
         $path = base_path('resources/generator-templates/'.$type.'/'.$template.'.stub');
 
         if (!file_exists($path)) {
-            $path = __DIR__.'/../../templates/'.$type.'/'.$template.'.stub';
+            $path = __DIR__.'/../templates/'.$type.'/'.$template.'.stub';
         }
 
         $fileData = file_get_contents($path);

@@ -22,7 +22,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Bluecode\\Generator\\": "src/"
+            "App\\": "app/",
+            "Bluecode\\Generator\\": "src"
         }
     },
     "suggest": {
