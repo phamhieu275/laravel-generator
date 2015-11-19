@@ -1,0 +1,14 @@
+@extends('$MAIN_LAYOUT$')
+
+@section('content')
+<div class="container">
+
+    @include('flash::message')
+
+    {!! Form::open(['route' => '$MODEL_NAME_PLURAL_CAMEL$.store']) !!}
+
+        @include('$MODEL_NAME_PLURAL_CAMEL$.form')
+
+    {!! Form::close() !!}
+</div>
+@endsection
