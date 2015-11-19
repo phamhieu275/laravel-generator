@@ -17,7 +17,7 @@ class GeneratorServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $configPath = __DIR__.'/../../../config/generator.php';
+        $configPath = __DIR__.'/../../config/generator.php';
 
         $this->publishes([
             $configPath => config_path('generator.php'),

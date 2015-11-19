@@ -34,7 +34,7 @@ class ServiceGenerator implements GeneratorProvider
         $path = $this->path.$fileName;
 
         $this->commandData->fileHelper->writeFile($path, $templateData);
-        $this->commandData->commandObj->comment("\Service created: ");
+        $this->commandData->commandObj->comment("\nService created: ");
         $this->commandData->commandObj->info($fileName);
     }
 }

@@ -1,6 +1,5 @@
 <?php namespace Bluecode\Generator\Generators\Common;
 
-use Config;
 use Bluecode\Generator\CommandData;
 use Bluecode\Generator\Generators\GeneratorProvider;
 use Bluecode\Generator\Utils\GeneratorUtils;
@@ -16,7 +15,7 @@ class RepositoryGenerator implements GeneratorProvider
     public function __construct($commandData)
     {
         $this->commandData = $commandData;
-        $this->path = Config::get('generator.path_repository', app_path('Repositories/'));
+        $this->path = config('generator.path_repository', app_path('Repositories/'));
     }
 
     public function generate()
@@ -31,10 +30,29 @@ class RepositoryGenerator implements GeneratorProvider
             mkdir($this->path, 0755, true);
         }
 
+        // check base repository file
+        if (!file_exists($this->path.'/Repository')) {
+            $this->generateBaseRepository();
+        }
+
         $path = $this->path.$fileName;
 
         $this->commandData->fileHelper->writeFile($path, $templateData);
         $this->commandData->commandObj->comment("\nRepository created: ");
+        $this->commandData->commandObj->info($fileName);
+    }
+
+    public function generateBaseRepository() {
+        $templateData = $this->commandData->templatesHelper->getTemplate('Repository', 'base');
+
+        $templateData = GeneratorUtils::fillTemplate($this->commandData->dynamicVars, $templateData);
+
+        $fileName = 'Repository.php';
+
+        $path = $this->path.$fileName;
+
+        $this->commandData->fileHelper->writeFile($path, $templateData);
+        $this->commandData->commandObj->comment("\nRepository generated");
         $this->commandData->commandObj->info($fileName);
     }
 }

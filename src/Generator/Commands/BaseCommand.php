@@ -66,7 +66,7 @@ class BaseCommand extends Command
             }
         } elseif ($this->commandData->fromTable) {
             $tableFieldsGenerator = new TableFieldsGenerator($this->commandData->fromTable);
-            $this->commandData->inputFields = $tableFieldsGenerator->generateFieldsFromTable();
+            $this->commandData->inputFields = $tableFieldsGenerator->generateFieldsFromTable($this->commandData->commandType);
 
             $tableRelationshipGenerator = new TableRelationshipsGenerator($this->commandData->fromTable);
             $this->commandData->relationships = $tableRelationshipGenerator->generateRelationshipsFromTable();

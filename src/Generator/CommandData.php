@@ -114,7 +114,7 @@ class CommandData
         if ($this->tableName) {
             $this->dynamicVars['$TABLE_NAME$'] = $this->tableName;
         } else {
-            $this->dynamicVars['$TABLE_NAME$'] = snake_case(str_plural($this->commandData->modelName));
+            $this->dynamicVars['$TABLE_NAME$'] = snake_case(str_plural($this->modelName));
         }
     }
 
@@ -186,7 +186,7 @@ class CommandData
 
             '$VIEW_PATH$'               => $viewPath,
 
-            '$ROUTE_PREFIX'             => $routePrefix,
+            '$ROUTE_PREFIX$'            => $routePrefix,
 
             '$PRIMARY_KEY$'             => 'id',
         ];

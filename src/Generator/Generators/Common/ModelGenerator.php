@@ -57,8 +57,17 @@ class ModelGenerator implements GeneratorProvider
             $templateData = str_replace('$AUTH_IMPLEMENTS$', '', $templateData);
         }
 
-        $variables['$IMPORT_TRAIT$'] = implode(PHP_EOL, $importTraits)."\n";
-        $variables['$USE_TRAIT$'] = "use ".implode(", ", $traits).";\n";
+        if (!empty($importTraits)) {
+            $variables['$IMPORT_TRAIT$'] = implode(PHP_EOL, $importTraits)."\n";
+        } else {
+            $variables['$IMPORT_TRAIT$'] = '';
+        }
+
+        if (!empty($traits)) {
+            $variables['$USE_TRAIT$'] = "use ".implode(", ", $traits).";\n";
+        } else {
+            $variables['$USE_TRAIT$'] = '';
+        }
 
         $templateData = GeneratorUtils::fillTemplate($variables, $templateData);
 

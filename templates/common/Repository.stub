@@ -1,7 +1,7 @@
 <?php namespace $NAMESPACE_REPOSITORY$;
 
 use $NAMESPACE_MODEL$\$MODEL_NAME$;
-use Bosnadev\Repositories\Eloquent\Repository;
+use $NAMESPACE_REPOSITORY$\Repository;
 
 class $MODEL_NAME$Repository extends Repository
 {
