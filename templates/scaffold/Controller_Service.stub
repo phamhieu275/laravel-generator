@@ -55,7 +55,7 @@ class $MODEL_NAME$Controller extends BaseController
 
         $$MODEL_NAME_CAMEL$ = $this->$MODEL_NAME_CAMEL$Service->create($input);
 
-        Flash::success('$MODEL_NAME$ saved successfully.');
+        Flash::success($MESSAGE_STORE$);
 
         return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
     }
@@ -91,7 +91,7 @@ class $MODEL_NAME$Controller extends BaseController
     /**
      * Update the specified $MODEL_NAME$ in storage.
      *
-     * @param  int              $id
+     * @param int $id
      * @param Update$MODEL_NAME$Request $request
      *
      * @return Response
@@ -102,7 +102,7 @@ class $MODEL_NAME$Controller extends BaseController
 
         $this->$MODEL_NAME_CAMEL$Service->update($id, $request->all());
 
-        Flash::success('$MODEL_NAME$ updated successfully.');
+        Flash::success($MESSAGE_UPDATE$);
 
         return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
     }
@@ -120,7 +120,7 @@ class $MODEL_NAME$Controller extends BaseController
 
         $this->$MODEL_NAME_CAMEL$Service->delete($id);
 
-        Flash::success('$MODEL_NAME$ deleted successfully.');
+        Flash::success($MESSAGE_DELETE$);
 
         return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
     }
@@ -136,7 +136,7 @@ class $MODEL_NAME$Controller extends BaseController
         try {
             $$MODEL_NAME_CAMEL$ = $this->$MODEL_NAME_CAMEL$Service->findOrFail($id);
         } catch(ModelNotFoundException $e) {
-            Flash::error('$MODEL_NAME$ not found');
+            Flash::error($MESSAGE_NOT_FOUND$);
 
             return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
         }

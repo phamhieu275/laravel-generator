@@ -35,8 +35,11 @@ class PublisherCommand extends Command
         if ($this->option('all')) {
             $this->publishCommonViews();
             $this->publishTemplates();
+            $this->publishBaseRepository();
         } elseif ($this->option('templates')) {
             $this->publishTemplates();
+        } elseif ($this->option('baseRepository')) {
+            $this->publishBaseRepository();
         } else {
             $this->publishCommonViews();
         }
@@ -62,6 +65,7 @@ class PublisherCommand extends Command
         return [
             ['templates', null, InputOption::VALUE_NONE, 'Publish templates'],
             ['all', null, InputOption::VALUE_NONE, 'Publish all options'],
+            ['baseRepository', null, InputOption::VALUE_NONE, 'Publish a base repository file.'],
         ];
     }
 
@@ -87,6 +91,32 @@ class PublisherCommand extends Command
         $viewsCopyPath = base_path('resources/views/common');
 
         $this->publishDirectory($viewsPath, $viewsCopyPath, 'common views');
+    }
+
+    public function publishBaseRepository()
+    {
+        $templateHelper = new TemplatesHelper();
+        $templateData = $templateHelper->getTemplate('Repository', 'base');
+
+        $templateData = GeneratorUtils::fillTemplate(CommandData::getConfigDynamicVariables(), $templateData);
+
+        $fileName = 'Repository.php';
+        $filePath = config('generator.path_repository', app_path('Repositories/'));
+
+        $destinationFile = $filePath.$fileName;
+
+        if (file_exists($destinationFile)) {
+            $answer = $this->ask('Do you want to overwrite '.$fileName.'? (y|N) :', false);
+
+            if (strtolower($answer) != 'y' and strtolower($answer) != 'yes') {
+                return;
+            }
+        }
+
+        $fileHelper = new FileHelper();
+        $fileHelper->writeFile($destinationFile, $templateData);
+        $this->comment('Base Repository generated');
+        $this->info($fileName);
     }
 
     public function publishFile($sourceFile, $destinationFile, $fileName)

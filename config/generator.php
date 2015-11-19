@@ -111,4 +111,24 @@ return [
     'use_repository_layer'  => true,
 
     'use_service_layer'     => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Message
+    |--------------------------------------------------------------------------
+    */
+    'message' => [
+        'en' => [
+            'store'     => ':model saved successfully.',
+            'update'    => ':model updated successfully.',
+            'delete'    => ':model deleted successfully.',
+            'not_found' => ':model not found',
+        ],
+        'ja' => [
+            'store'     => '新規登録が完了しました。',
+            'update'    => '更新が完了しました。',
+            'delete'    => '削除が完了しました。',
+            'not_found' => 'この:modelが存在していません。',
+        ]
+    ]
 ];

@@ -6,6 +6,7 @@ use $NAMESPACE_REQUEST$;
 use $NAMESPACE_REQUEST$\Create$MODEL_NAME$Request;
 use $NAMESPACE_REQUEST$\Update$MODEL_NAME$Request;
 use $BASE_CONTROLLER$ as BaseController;
+use $NAMESPACE_MODEL$\$MODEL_NAME$;
 use Flash;
 
 class $MODEL_NAME$Controller extends BaseController
@@ -44,11 +45,11 @@ class $MODEL_NAME$Controller extends BaseController
     {
         $input = $request->all();
 
-        $MODEL_NAME_CAMEL$::create($input)
+        $MODEL_NAME$::create($input);
         
-        Flash::success('$MODEL_NAME$ saved successfully.');
+        Flash::success($MESSAGE_STORE$);
         
-        return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index')));
+        return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
     }
 
     /**
@@ -82,7 +83,7 @@ class $MODEL_NAME$Controller extends BaseController
     /**
      * Update the specified $MODEL_NAME$ in storage.
      *
-     * @param  int              $id
+     * @param int $id
      * @param Update$MODEL_NAME$Request $request
      *
      * @return Response
@@ -91,11 +92,11 @@ class $MODEL_NAME$Controller extends BaseController
     {
         $$MODEL_NAME_CAMEL$ = $this->exist($id);
 
-        $$MODEL_NAME_CAMEL->fill($request->all());
+        $$MODEL_NAME_CAMEL$->fill($request->all());
 
         $$MODEL_NAME_CAMEL$->save();
 
-        Flash::success('$MODEL_NAME$ updated successfully.');
+        Flash::success($MESSAGE_UPDATE$);
 
         return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
     }
@@ -113,7 +114,7 @@ class $MODEL_NAME$Controller extends BaseController
 
         $$MODEL_NAME_CAMEL$->delete();
 
-        Flash::success('$MODEL_NAME$ deleted successfully.');
+        Flash::success($MESSAGE_DELETE$);
 
         return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
     }
@@ -129,7 +130,7 @@ class $MODEL_NAME$Controller extends BaseController
         try {
             $$MODEL_NAME_CAMEL$ = $MODEL_NAME$::findOrFail($id);
         } catch(ModelNotFoundException $e) {
-            Flash::error('$MODEL_NAME$ not found');
+            Flash::error($MESSAGE_NOT_FOUND$);
 
             return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
         }

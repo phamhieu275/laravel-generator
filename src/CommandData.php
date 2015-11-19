@@ -116,6 +116,27 @@ class CommandData
         } else {
             $this->dynamicVars['$TABLE_NAME$'] = snake_case(str_plural($this->modelName));
         }
+
+        // init message
+        if ($this->commandType === static::$COMMAND_TYPE_SCAFFOLD) {
+            $locale = config('app.locale');
+            $configMessages = config('generator.message');
+            if (isset($configMessages[$locale])) {
+                $messages = $configMessages[$locale];
+            } else {
+                $messages = $configMessages['en'];
+            }
+            $this->dynamicVars = array_merge([
+                '$MESSAGE_STORE$'     => "'".str_replace(':model', '$MODEL_NAME$', $messages['store'])."'",
+
+                '$MESSAGE_UPDATE$'    => "'".str_replace(':model', '$MODEL_NAME$', $messages['update'])."'",
+
+                '$MESSAGE_DELETE$'    => "'".str_replace(':model', '$MODEL_NAME$', $messages['delete'])."'",
+                    
+                '$MESSAGE_NOT_FOUND$' => "'".str_replace(':model', '$MODEL_NAME$', $messages['not_found'])."'",
+
+            ], $this->dynamicVars);
+        }
     }
 
     public function addDynamicVariable($name, $val)
