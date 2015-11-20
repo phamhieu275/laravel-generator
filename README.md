@@ -50,7 +50,7 @@ Documentation
         "require": {
             "laracasts/flash": "dev-master",
             "laravelcollective/html": "5.1.*@dev",
-            "matmaxanh/laravel-generator": "dev-master"
+            "bluecode/laravel-generator": "dev-master"
         }
   
 2. Run composer update
@@ -63,7 +63,7 @@ Documentation
 
 		Collective\Html\HtmlServiceProvider::class,
 		Laracasts\Flash\FlashServiceProvider::class,
-		matmaxanh\Generator\GeneratorServiceProvider::class,
+		Bluecode\Generator\GeneratorServiceProvider::class,
         
    Also for convenience, add these facades in alias array in ```config/app.php```.
 
@@ -75,7 +75,7 @@ Documentation
 
 Publish Configuration file ```generator.php```.
 
-        php artisan vendor:publish --provider="Bluecode\Generator\GeneratorServiceProvider"
+        php artisan vendor:publish	
         
 Config file (```config/generator.php```) contains path for all generated files
 
@@ -97,6 +97,14 @@ Config file (```config/generator.php```) contains path for all generated files
 ```namespace_request``` - Namespace for Request<br>
 
 ```model_extend_class``` - Extend class of Models<br>
+
+```main_layout``` - Extend master layout<br>
+
+```route_prefix``` - Prefix of scaffold route<br>
+
+```use_repository_layer``` - Using repository layer<br>
+
+```use_service_layer``` - Using service layer<br>
 
 ## Publish & Initialization
 
@@ -129,7 +137,7 @@ e.g.
     php artisan Bluecode.generator:model Post
 
     php artisan Bluecode.generator:migrate
-    php artisan Bluecode.generator:migrate projects
+    php artisan Bluecode.generator:migrate posts,projects
 
 Here is the sample [fields input json](https://github.com/matmaxanh/laravel-generator/blob/master/samples/fields.json)
 
