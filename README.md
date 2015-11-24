@@ -68,7 +68,7 @@ Documentation
 
 Publish Configuration file ```generator.php```.
 
-        php artisan vendor:publish	
+        php artisan vendor:publish
         
 Config file (```config/generator.php```) contains path for all generated files
 
