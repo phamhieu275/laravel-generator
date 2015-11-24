@@ -25,7 +25,10 @@ class $CLASS$ extends Migration
      */
     public function down()
     {
-        Schema::drop('$TABLE$');
+        Schema::$METHOD$('$TABLE$', function(Blueprint $table)
+        {
+            $DOWN$
+        });
     }
 
 }

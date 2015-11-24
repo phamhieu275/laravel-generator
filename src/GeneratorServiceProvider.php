@@ -1,12 +1,6 @@
 <?php namespace Bluecode\Generator;
 
 use Illuminate\Support\ServiceProvider;
-use Bluecode\Generator\Commands\APIGeneratorCommand;
-use Bluecode\Generator\Commands\PublisherCommand;
-use Bluecode\Generator\Commands\ScaffoldAPIGeneratorCommand;
-use Bluecode\Generator\Commands\ScaffoldGeneratorCommand;
-use Bluecode\Generator\Commands\ModelGeneratorCommand;
-use Bluecode\Generator\Commands\MigrateGeneratorCommand;
 
 class GeneratorServiceProvider extends ServiceProvider
 {
@@ -31,27 +25,13 @@ class GeneratorServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('generate.publish', function ($app) {
-            return new PublisherCommand();
-        });
-
-        $this->app->singleton('generate.scaffold', function ($app) {
-            return new ScaffoldGeneratorCommand();
-        });
-
-        $this->app->singleton('generate.model', function ($app) {
-            return new ModelGeneratorCommand();
-        });
-
-        $this->app->singleton('generate.migrate', function ($app) {
-            return new MigrateGeneratorCommand();
-        });
-
-        $this->commands([
-            'generate.publish',
-            'generate.scaffold',
-            'generate.model',
-            'generate.migrate',
-        ]);
+        $this->commands(
+            'Bluecode\Generator\Commands\PublishCommand',
+            'Bluecode\Generator\Commands\MigrationMakeCommand',
+            'Bluecode\Generator\Commands\ModelMakeCommand',
+            'Bluecode\Generator\Commands\ScaffoldMakeCommand',
+            'Bluecode\Generator\Commands\FactoryMakeCommand',
+            'Bluecode\Generator\Commands\ResourceMakeCommand'
+        );
     }
 }

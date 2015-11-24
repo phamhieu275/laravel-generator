@@ -1,4 +1,4 @@
-Laravel Scaffold/CRUD Generator (Laravel5.1)
+Laravel Resource Generator (Laravel5.1)
 ======================= 
 
 The artisan command can generate the following items:
@@ -14,8 +14,7 @@ The artisan command can generate the following items:
     * edit.blade.php
     * form.blade.php
   * adjusts routes.php
-
-And your simple CRUD and APIs are ready in mere seconds.
+  * adjusts ModelFactory.php
 
 Here is the full documentation.
 
@@ -31,23 +30,17 @@ Documentation
 3. [Publish & Initialization](#publish--initialization)
 4. [Generator](#generator)
 5. [Supported Field Types](#supported-field-types)
-5. [Customization](#customization)
-	1. [Base Controller](#base-controller)
-	2. [Customize Templates](#customize-templates)
+5. [Customize Templates](#customize-templates)
 6. [Options](#options)
 	1. [Paginate Records](#paginate-records)
-	2. [Model Soft Deletes](#model-soft-deletes)
-	3. [Fields From File](#fields-from-file)
-	4. [Custom Table Name](#custom-table-name)
-	5. [Skip Migration](#skip-migration)
-	6. [Remember Token](#remember-token)
-7. [Generator from existing tables](#generator-from-existing-tables)
+	2. [Auth triat](#model-auth)
 
 ## Installation
 
 1. Add this package to your composer.json:
   
         "require": {
+            "doctrine/dbal": "^2.5",
             "laracasts/flash": "dev-master",
             "laravelcollective/html": "5.1.*@dev",
             "bluecode/laravel-generator": "dev-master"
@@ -108,38 +101,61 @@ Config file (```config/generator.php```) contains path for all generated files
 
 ## Publish & Initialization
 
-Mainly, we need to do three basic things to get started.
 1. Publish some common views like ```paginate.blade.php```.
-        php artisan generate:publish
+        php artisan generator:publish
+
+2. Publish template.
+        php artisan generator:publish --templates
+
+3. Publish a base repository file
+        php artisan generator:publish --baseRepository
 
 ## Generator
 
-Fire artisan command to generate API, Scaffold with CRUD views or both API as well as CRUD views.
+Fire artisan command to generate Migration, Model, Scaffold with CRUD views from exist tables.
+This package can generate files from a specify table or from all tables in database.
+
+This package require you to pass at least one argument for table name.
+If you want to pass many table name, a list table name will separate by comma.
+
+Generate Migration From Exist Tables:
+  
+        php artisan generator:make:migrate TableName
 
 Generate CRUD Scaffold:
  
-        php artisan generate:scaffold ModelName
+        php artisan generator:make:scaffold TableName
 
 Generate Model With Validation And Relationships:
 
-        php artisan generate:model ModelName
-        
-Generate Migrate From Exist Tables:
-        
-        php artisan generate:migrate
+        php artisan generator:make:model TableName
+
+Generate Factory From Exist Tables:
+
+        php artisan generator:make:factory TableName
+
+Generate All Resource File:
+
+        php artisan generator:make:resource TableName
         
 e.g.
-    
-    php artisan Bluecode.generator:scaffold Project
-    php artisan Bluecode.generator:scaffold Post
+    php artisan generator:migrate
+    php artisan generator:migrate posts,comments
 
-    php artisan Bluecode.generator:model Project
-    php artisan Bluecode.generator:model Post
+    php artisan generator:make:model 
+    php artisan generator:make:model posts,comments
+    php artisan generator:make:model --tables=posts,comments
+    php artisan generator:make:model --ignore=posts,comments
+    php artisan generator:make:model posts,comments --models=Post,Comment
 
-    php artisan Bluecode.generator:migrate
-    php artisan Bluecode.generator:migrate posts,projects
+    php artisan generator:make:scaffold
+    php artisan generator:make:scaffold posts,comments
+    php artisan generator:make:scaffold --tables=posts,comments
+    php artisan generator:make:scaffold --ignore=posts,comments
 
-Here is the sample [fields input json](https://github.com/matmaxanh/laravel-generator/blob/master/samples/fields.json)
+    php artisan generator:make:factory posts,comments
+
+    php artisan generator:make:resource posts,comments
 
 ## Supported HTML Field Types
 
@@ -148,22 +164,17 @@ Here is the list of supported field types with options:
   * textarea
   * password
   * email
-  * file
   * checkbox
-  * radio:male,female,option3,option4
   * number
   * date
-  * select:India,USA
 
-## Customization
-
-### Customize Templates
+## Customize Templates
 
 To use your own custom templates,
 
 1. Publish templates to  ```/resources/generator-templates```
 
-        php artisan generate:publish --templates
+        php artisan generator:publish --templates
 
 2. Leave only those templates that you want to change. Remove the templates that do not plan to change.
 
@@ -174,54 +185,17 @@ To use your own custom templates,
 To paginate records, you can specify paginate option,
 e.g.
 
-        php artisan generate:scaffold Post --paginate=10
+        php artisan generator:make:scaffold posts --paginate=10
 
-### Model Soft Deletes
+### Model use Auth
 
-To use SoftDelete, use softDelete option,
+To use Auth trait, use auth option,
 
-        php artisan generate:scaffold Post --softDelete
-
-### Fields From File
-
-If you want to pass fields from file then you can create fields json file and pass it via command line. Here is the sample [fields.json](https://github.com/matmaxanh/laravel-generator/blob/master/samples/fields.json)
-
-You have to pass option ```--fieldsFile=absolute_file_path_or_path_from_base_directory``` with command. e.g.
-
-         php artisan generate:scaffold Post --fieldsFile="/Users/Local/laravel-generator/fields.json"
-         php artisan generate:scaffold Post --fieldsFile="fields.json"
-
-### Custom Table Name
-
-You can also specify your own custom table name by,
-
-        php artisan generate:scaffold Post --tableName=custom_table_name
-
-### Skip Migration
-
-You can also skip migration generation,
-
-        php artisan generate:scaffold Post --skipMigration
-
-### Remember Token
-
-To generate rememberToken field in migration file,
-
-        php artisan generate:scaffold Post --rememberToken
-
-## Generator from existing tables
-
-To use generator with existing table, you can specify ```--fromTable``` option. ```--tableName``` option is required and you need to specify table name.
-
-Just make sure, you have installed ```doctrine/dbal``` package.
-
-**Limitation:** As of now it is not fully working (work is in progress). It will not create migration file. You need to tweak some of the things in your generated files like timestamps, primary key etc. 
-
-        php artisan generate:scaffold Post --fromTable --tableName=posts
+        php artisan generator:make:model users --auth
 
 Credits
 --------
 
-This API Generator is created by [matmaxanh](https://github.com/matmaxanh).
+This Laravel Generator is created by [Bluecode](https://github.com/matmaxanh).
 
 **Bugs & Forks are welcomed :)**

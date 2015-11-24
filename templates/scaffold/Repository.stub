@@ -1,0 +1,17 @@
+<?php namespace $NAMESPACE_REPOSITORY$;
+
+use $NAMESPACE_MODEL$\$MODEL_NAME$;
+use $NAMESPACE_REPOSITORY$\Repository;
+
+class $MODEL_NAME$Repository extends Repository
+{
+
+    /**
+    * Configure the Model
+    *
+    **/
+    public function model()
+    {
+        return $MODEL_NAME$::class;
+    }
+}

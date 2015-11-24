@@ -29,7 +29,7 @@ class $MODEL_NAME$Controller extends BaseController
     {
         $$MODEL_NAME_PLURAL_CAMEL$ = $this->$MODEL_NAME_CAMEL$Service->$RENDER_TYPE$;
 
-        return view('$VIEW_PATH$$MODEL_NAME_PLURAL_CAMEL$.index')->with(compact('$MODEL_NAME_PLURAL_CAMEL$'));
+        return view('$VIEW_PATH$$VIEW_FOLDER_NAME$.index')->with(compact('$MODEL_NAME_PLURAL_CAMEL$'));
     }
 
     /**
@@ -39,7 +39,7 @@ class $MODEL_NAME$Controller extends BaseController
      */
     public function create()
     {
-        return view('$VIEW_PATH$$MODEL_NAME_PLURAL_CAMEL$.create');
+        return view('$VIEW_PATH$$VIEW_FOLDER_NAME$.create');
     }
 
     /**
@@ -57,7 +57,7 @@ class $MODEL_NAME$Controller extends BaseController
 
         Flash::success($MESSAGE_STORE$);
 
-        return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
+        return redirect(route('$ROUTE_PREFIX$$RESOURCE_URL$.index'));
     }
 
     /**
@@ -71,7 +71,7 @@ class $MODEL_NAME$Controller extends BaseController
     {
         $$MODEL_NAME_CAMEL$ = $this->exist($id);
 
-        return view('$VIEW_PATH$$MODEL_NAME_PLURAL_CAMEL$.show')->with(compact('$MODEL_NAME_CAMEL$'));
+        return view('$VIEW_PATH$$VIEW_FOLDER_NAME$.show')->with(compact('$MODEL_NAME_CAMEL$'));
     }
 
     /**
@@ -85,7 +85,7 @@ class $MODEL_NAME$Controller extends BaseController
     {
         $$MODEL_NAME_CAMEL$ = $this->exist($id);
 
-        return view('$VIEW_PATH$$MODEL_NAME_PLURAL_CAMEL$.edit')->with(compact('$MODEL_NAME_CAMEL$'));
+        return view('$VIEW_PATH$$VIEW_FOLDER_NAME$.edit')->with(compact('$MODEL_NAME_CAMEL$'));
     }
 
     /**
@@ -104,7 +104,7 @@ class $MODEL_NAME$Controller extends BaseController
 
         Flash::success($MESSAGE_UPDATE$);
 
-        return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
+        return redirect(route('$ROUTE_PREFIX$$RESOURCE_URL$.index'));
     }
 
     /**
@@ -122,7 +122,7 @@ class $MODEL_NAME$Controller extends BaseController
 
         Flash::success($MESSAGE_DELETE$);
 
-        return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
+        return redirect(route('$ROUTE_PREFIX$$RESOURCE_URL$.index'));
     }
 
     /**
@@ -138,7 +138,7 @@ class $MODEL_NAME$Controller extends BaseController
         } catch(ModelNotFoundException $e) {
             Flash::error($MESSAGE_NOT_FOUND$);
 
-            return redirect(route('$ROUTE_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index'));
+            return redirect(route('$ROUTE_PREFIX$$RESOURCE_URL$.index'));
         }
 
         return $$MODEL_NAME_CAMEL$;

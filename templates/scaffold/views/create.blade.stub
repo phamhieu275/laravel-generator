@@ -5,9 +5,9 @@
 
     @include('flash::message')
 
-    {!! Form::open(['route' => '$MODEL_NAME_PLURAL_CAMEL$.store']) !!}
+    {!! Form::open(['route' => '$RESOURCE_URL$.store', 'class' => 'form-horizontal']) !!}
 
-        @include('$MODEL_NAME_PLURAL_CAMEL$.form')
+        @include('$VIEW_FOLDER_NAME$.form')
 
     {!! Form::close() !!}
 </div>

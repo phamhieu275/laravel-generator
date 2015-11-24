@@ -32,11 +32,13 @@ return [
 
     'path_controller'          => app_path('Http/Controllers/'),
 
-    'path_views'               => base_path('resources/views/'),
+    'path_view'                => base_path('resources/views/'),
 
     'path_request'             => app_path('Http/Requests/'),
 
-    'path_routes'              => app_path('Http/routes.php'),
+    'path_route'               => app_path('Http/routes.php'),
+
+    'path_factory'             => base_path('database/factories/ModelFactory.php'),
 
     /*
     |--------------------------------------------------------------------------

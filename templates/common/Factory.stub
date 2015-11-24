@@ -1,0 +1,5 @@
+$factory->define($NAMESPACE_MODEL$\$MODEL_NAME$::class, function (Faker\Generator $faker) {
+    return [
+        $FIELDS$
+    ];
+});
