@@ -38,6 +38,5 @@ class $MODEL_NAME$ extends Model$AUTH_IMPLEMENTS$
     public static $rules = [
         $RULES$
     ];
-
     $RELATIONSHIPS$
 }
