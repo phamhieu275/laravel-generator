@@ -152,6 +152,10 @@ class ModelRelationshipsGenerator
     {
         $foreign = $table->getForeignKeys();
 
+        // getForeignKeys() method of table return associative Array
+        // Convert to simple Array to avoid fatal error where using numeric key
+        $foreign = array_values($foreign);
+
         $fk1 = $foreign[0];
         $fk1Table = $fk1->getForeignTableName();
         $fk1Field = current($fk1->getLocalColumns());
@@ -161,8 +165,9 @@ class ModelRelationshipsGenerator
         $fk2Field = current($fk2->getLocalColumns());
 
         //User belongstomany groups user_group, user_id, group_id
-        $this->relationships[$fk1Table]['belongsToMany'][] = [$fk2Table, $table, $fk1Field, $fk2Field];
-        $this->relationships[$fk2Table]['belongsToMany'][] = [$fk1Table, $table, $fk2Field, $fk1Field];
+        // Use getName() method on table to get name of table.
+        $this->relationships[$fk1Table]['belongsToMany'][] = [$fk2Table, $table->getName(), $fk1Field, $fk2Field];
+        $this->relationships[$fk2Table]['belongsToMany'][] = [$fk1Table, $table->getName(), $fk2Field, $fk1Field];
     }
 
     /**
