@@ -134,7 +134,7 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
                 continue;
             }
 
-            $existRules[$key['field']] = 'exist:'.$key['on'].','.$key['references'];
+            $existRules[$key['field']] = 'exists:'.$key['on'].','.$key['references'];
         }
 
         foreach ($this->fillableColumns as $column) {
