@@ -77,6 +77,7 @@ class SchemaParser
             }
 
             if (in_array($column['type'], [
+                'unique',
                 'tinyIncrements',
                 'smallIncrements',
                 'mediumIncrements',
