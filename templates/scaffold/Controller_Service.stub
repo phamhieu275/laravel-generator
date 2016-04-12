@@ -10,7 +10,7 @@ use Flash;
 class $MODEL_NAME$Controller extends BaseController
 {
 
-    /** 
+    /**
      * @var  $MODEL_NAME$Service
      */
     private $$MODEL_NAME_CAMEL$Service;

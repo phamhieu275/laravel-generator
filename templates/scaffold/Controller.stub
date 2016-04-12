@@ -46,9 +46,9 @@ class $MODEL_NAME$Controller extends BaseController
         $input = $request->all();
 
         $MODEL_NAME$::create($input);
-        
+
         Flash::success($MESSAGE_STORE$);
-        
+
         return redirect(route('$ROUTE_PREFIX$$RESOURCE_URL$.index'));
     }
 
@@ -62,7 +62,7 @@ class $MODEL_NAME$Controller extends BaseController
     public function show($id)
     {
         $$MODEL_NAME_CAMEL$ = $this->exist($id);
-        
+
         return view('$VIEW_PATH$$VIEW_FOLDER_NAME$.show')->with(compact('$MODEL_NAME_CAMEL$'));
     }
 
@@ -76,7 +76,7 @@ class $MODEL_NAME$Controller extends BaseController
     public function edit($id)
     {
         $$MODEL_NAME_CAMEL$ = $this->exist($id);
-        
+
         return view('$VIEW_PATH$$VIEW_FOLDER_NAME$.edit')->with(compact('$MODEL_NAME_CAMEL$'));
     }
 
