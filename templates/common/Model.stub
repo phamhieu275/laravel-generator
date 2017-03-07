@@ -1,4 +1,6 @@
-<?php namespace $NAMESPACE_MODEL$;
+<?php 
+
+namespace $NAMESPACE_MODEL$;
 
 use $NAMESPACE_MODEL_EXTEND$ as Model;
 $IMPORT_TRAIT$
