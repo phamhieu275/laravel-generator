@@ -69,7 +69,7 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
         $schema = $this->schemaParser->getFields($data['TABLE_NAME']);
 
         if (empty($schema)) {
-            continue;
+            return;
         }
 
         $this->fillableColumns = $this->schemaParser->getFillableFieldsFromSchema($schema);
