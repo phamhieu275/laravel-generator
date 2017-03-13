@@ -39,46 +39,9 @@ class FieldParser
         }
 
         $indexParser = new IndexParser($table, $schema);
-        $fields = $this->setEnum($this->getFields($columns, $indexParser), $table);
+        $fields = $this->getFields($columns, $indexParser);
         $indexes = $this->getMultiFieldIndexes($indexParser);
         return array_merge($fields, $indexes);
-    }
-
-    /**
-     * Return all enum columns for a given table
-     * @param string $table
-     * @return array
-     */
-    protected function getEnum($table)
-    {
-        try {
-            $result = \DB::table('information_schema.columns')
-                ->where('table_schema', $this->database)
-                ->where('table_name', $table)
-                ->where('data_type', 'enum')
-                ->get(['column_name','column_type']);
-            if ($result) {
-                return $result;
-            } else {
-                return [];
-            }
-        } catch (\Exception $e) {
-            return [];
-        }
-    }
-
-    /**
-     * @param array $fields
-     * @param string $table
-     * @return array
-     */
-    protected function setEnum(array $fields, $table)
-    {
-        foreach ($this->getEnum($table) as $column) {
-            $fields[$column->column_name]['type'] = 'enum';
-            $fields[$column->column_name]['args'] = str_replace('enum(', 'array(', $column->column_type);
-        }
-        return $fields;
     }
 
     /**
@@ -88,6 +51,7 @@ class FieldParser
      */
     protected function getFields($columns, IndexParser $indexParser)
     {
+        $hasFieldCreatedAt = $hasFieldUpdatedAt = false;
         $fields = array();
         foreach ($columns as $column) {
             $name = $column->getName();
@@ -97,78 +61,113 @@ class FieldParser
             $nullable = (!$column->getNotNull());
             $index = $indexParser->getIndex($name);
 
-            $decorators = null;
+            $decorators = [];
             $args = null;
 
             if (isset($this->fieldTypeMap[$type])) {
                 $type = $this->fieldTypeMap[$type];
             }
 
-            // Different rules for different type groups
-            if (in_array($type, ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'])) {
-                // Integer
-                if ($column->getUnsigned() && $column->getAutoincrement()) {
-                    if ($type == 'integer') {
-                        $type = 'increments';
+            switch ($type) {
+                case 'tinyInteger':
+                case 'smallInteger':
+                case 'mediumInteger':
+                case 'integer':
+                case 'bigInteger':
+                    if ($column->getUnsigned() && $column->getAutoincrement()) {
+                        if ($type == 'integer') {
+                            $type = 'increments';
+                        } else {
+                            $type = str_replace('Integer', 'Increments', $type);
+                        }
+
+                        $index = null;
                     } else {
-                        $type = str_replace('Integer', 'Increments', $type);
+                        if ($column->getUnsigned()) {
+                            $decorators[] = 'unsigned';
+                        }
+
+                        if ($column->getAutoincrement()) {
+                            $args = 'true';
+                            $index = null;
+                        }
                     }
-                    
-                    $index = null;
-                } else {
+                    break;
+
+                case 'timestamps':
+                    if ($name == 'created_at') {
+                        $hasFieldCreatedAt = true;
+                    }
+
+                    if ($name == 'updated_at') {
+                        $hasFieldUpdatedAt = true;
+                    }
+                    break;
+
+                case 'dateTime':
+                    if ($name == 'deleted_at' && $nullable) {
+                        $nullable = false;
+                        $type = 'softDeletes';
+                        $name = '';
+                    }
+                    break;
+
+                case 'decimal':
+                case 'float':
+                case 'double':
+                    // Precision based numbers
+                    $args = $this->getPrecision($column->getPrecision(), $column->getScale());
                     if ($column->getUnsigned()) {
                         $decorators[] = 'unsigned';
                     }
-                    if ($column->getAutoincrement()) {
-                        $args = 'true';
-                        $index = null;
+                    break;
+
+                default:
+                    // Probably not a number (string/char)
+                    if ($type === 'string' && $column->getFixed()) {
+                        $type = 'char';
                     }
-                }
-            } elseif ($type == 'dateTime') {
-                if ($name == 'deleted_at' && $nullable) {
-                    $nullable = false;
-                    $type = 'softDeletes';
-                    $name = '';
-                } elseif ($name == 'created_at' && isset($fields['updated_at'])) {
-                    $fields['updated_at'] = ['field' => '', 'type' => 'timestamps'];
-                    continue;
-                } elseif ($name == 'updated_at' and isset($fields['created_at'])) {
-                    $fields['created_at'] = ['field' => '', 'type' => 'timestamps'];
-                    continue;
-                }
-            } elseif (in_array($type, ['decimal', 'float', 'double'])) {
-                // Precision based numbers
-                $args = $this->getPrecision($column->getPrecision(), $column->getScale());
-                if ($column->getUnsigned()) {
-                    $decorators[] = 'unsigned';
-                }
-            } else {
-                // Probably not a number (string/char)
-                if ($type === 'string' && $column->getFixed()) {
-                    $type = 'char';
-                }
-                $args = $this->getLength($length);
+
+                    if ($type !== 'text') {
+                        $args = $this->getLength($length);
+                    }
+                    break;
             }
 
             if ($nullable) {
                 $decorators[] = 'nullable';
             }
+
             if ($default !== null) {
                 $decorators[] = $this->getDefault($default, $type);
             }
+
             if ($index) {
                 $decorators[] = $this->decorate($index->type, $index->name);
             }
 
             $field = ['field' => $name, 'type' => $type];
-            if ($decorators) {
+
+            $comment = $column->getComment();
+            if (!empty($comment)) {
+                $decorators[] = $this->decorate('comment', $comment);
+            }
+
+            if (!empty($decorators)) {
                 $field['decorators'] = $decorators;
             }
+
             if ($args) {
                 $field['args'] = $args;
             }
-            $fields[$name] = $field;
+
+            $fields[] = $field;
         }
+
+        if ($hasFieldCreatedAt && $hasFieldUpdatedAt) {
+            $fields[] = ['field' => '', 'type' => 'timestamps'];
+        }
+
         return $fields;
     }
 
@@ -178,7 +177,7 @@ class FieldParser
      */
     protected function getLength($length)
     {
-        if ($length and $length !== 255) {
+        if ($length && $length !== 255) {
             return $length;
         }
     }
@@ -195,7 +194,7 @@ class FieldParser
                 $type = 'timestamp';
             }
             $default = $this->decorate('DB::raw', $default);
-        } elseif (in_array($type, ['string', 'text']) or !is_numeric($default)) {
+        } elseif (in_array($type, ['string', 'text']) || !is_numeric($default)) {
             $default = $this->argsToString($default);
         }
         return $this->decorate('default', $default, '');
@@ -208,7 +207,7 @@ class FieldParser
      */
     protected function getPrecision($precision, $scale)
     {
-        if ($precision != 8 or $scale != 2) {
+        if ($precision != 8 || $scale != 2) {
             $result = $precision;
             if ($scale != 2) {
                 $result .= ', ' . $scale;
