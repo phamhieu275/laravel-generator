@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "laravelcollective/html":"^5.4.0",
-        "laracasts/flash": "stable"
+        "laracasts/flash": "^3.0"
     },
     "autoload": {
         "psr-4": {
