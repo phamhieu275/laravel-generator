@@ -17,8 +17,11 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/support": "~5.0",
         "doctrine/dbal": "^2.5"
+    },
+    "require-dev": {
+        "laravelcollective/html":"^5.4.0",
+        "laracasts/flash": "stable"
     },
     "autoload": {
         "psr-4": {
