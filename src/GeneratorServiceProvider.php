@@ -15,7 +15,7 @@ class GeneratorServiceProvider extends ServiceProvider
 
         $this->publishes([
             $configPath => config_path('generator.php'),
-        ]);
+        ], 'config');
 
         $this->mergeConfigFrom($configPath, 'generator');
     }

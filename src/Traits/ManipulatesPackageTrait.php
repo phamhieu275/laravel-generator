@@ -84,12 +84,12 @@ trait ManipulatesPackageTrait
      */
     protected function createRouteFile($packagePath)
     {
-        if (File::exists($packagePath . '/src/route.php')) {
+        if (File::exists($packagePath . '/src/routes.php')) {
             return;
         }
 
-        File::put($packagePath . '/src/route.php', '');
+        File::put($packagePath . '/src/routes.php', '');
 
-        $this->info('route.php created successfully.');
+        $this->info('routes.php created successfully.');
     }
 }

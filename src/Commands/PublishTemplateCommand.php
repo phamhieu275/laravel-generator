@@ -29,7 +29,7 @@ class PublishTemplateCommand extends Command
     {
         $templatesPath = __DIR__.'/../../templates';
 
-        $templatesCopyPath = config('generator.path_template');
+        $templatesCopyPath = config('generator.path_public_template');
 
         $this->copyDirectory($templatesPath, $templatesCopyPath, 'templates');
 

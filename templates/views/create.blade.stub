@@ -1,10 +1,16 @@
 @extends('DummyMainLayout')
+@section('title', __('Create'))
 
 @section('content')
-<div class="container">
+<div class="row">
+    <div class="col-md-6 col-xs-12">
 
-    {!! Form::open(['route' => 'DummyResourceUrl.store', 'class' => 'form-horizontal']) !!}
+    {!! Form::open(['route' => 'DummyResourceUrl.store']) !!}
+
+    @include('DummyViewPath.form')
 
     {!! Form::close() !!}
+
+    </div>
 </div>
 @endsection
