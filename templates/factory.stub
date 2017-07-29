@@ -1,0 +1,6 @@
+<?php
+
+$factory->define(DummyNamespace\DummyClass::class, function (Faker\Generator $faker) {
+    return [
+    ];
+});

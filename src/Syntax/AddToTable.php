@@ -1,4 +1,6 @@
-<?php namespace Bluecode\Generator\Syntax;
+<?php
+
+namespace Bluecode\Generator\Syntax;
 
 /**
  * Class AddToTable
@@ -24,24 +26,26 @@ class AddToTable extends Table
             $property = $property ? "'$property'" : null;
         }
 
-        $type = $field['type'];
-
-        $output = sprintf(
-            "\$table->%s(%s)",
-            $type,
-            $property
-        );
+        $func = $field['type'];
 
         // If we have args, then it needs
         // to be formatted a bit differently
         if (isset($field['args'])) {
             $output = sprintf(
                 "\$table->%s(%s, %s)",
-                $type,
+                $func,
                 $property,
                 $field['args']
             );
+        } else {
+            $output = sprintf(
+                "\$table->%s(%s)",
+                $func,
+                $property
+            );
         }
+
+
         if (isset($field['decorators'])) {
             $output .= $this->addDecorators($field['decorators']);
         }

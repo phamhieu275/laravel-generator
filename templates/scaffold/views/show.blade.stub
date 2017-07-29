@@ -1,7 +1,0 @@
-@extends('$MAIN_LAYOUT$')
-
-@section('content')
-<div class="container">
-    $FIELDS$
-</div>
-@endsection

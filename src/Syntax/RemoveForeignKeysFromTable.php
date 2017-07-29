@@ -1,4 +1,6 @@
-<?php namespace Bluecode\Generator\Syntax;
+<?php
+
+namespace Bluecode\Generator\Syntax;
 
 /**
  * Class RemoveForeignKeysFromTable

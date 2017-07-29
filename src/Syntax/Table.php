@@ -1,4 +1,6 @@
-<?php namespace Bluecode\Generator\Syntax;
+<?php
+
+namespace Bluecode\Generator\Syntax;
 
 /**
  * Class Table
@@ -15,7 +17,7 @@ abstract class Table
     {
         $this->table = $table;
         $schema = $this->getItems($fields);
-        return implode(PHP_EOL."\t\t\t", $schema);
+        return implode(PHP_EOL . str_repeat(' ', 12), $schema);
     }
 
     /**

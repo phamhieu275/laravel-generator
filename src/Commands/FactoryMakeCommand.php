@@ -1,74 +1,81 @@
-<?php namespace Bluecode\Generator\Commands;
+<?php
 
-use Bluecode\Generator\Generators\FactoryGenerator;
+namespace Bluecode\Generator\Commands;
+
+use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
+use Bluecode\Generator\Traits\TemplateTrait;
 
 class FactoryMakeCommand extends GeneratorCommand
 {
+    use TemplateTrait;
+
     /**
-     * The name and signature of the console command.
+     * The name of the console command.
      *
      * @var string
      */
-    protected $signature = 'generator:make:factory
-                                {tables?} : List table name for generate migration files.}
-                                {--tables= : List table name for generate migration files.}
-                                {--ignore= : List ignore table name.}
-                                {--models= : List model name for seed.}';
+    protected $name = 'generator:make:factory';
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create factory setup for given table.';
-    /**
-     * A list model name for generate
-     *
-     * @var array
-     */
-    public $models = [];
 
     /**
-     * Get the type of command
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Factory';
+
+    /**
+     * Get the stub file for the generator.
      *
      * @return string
      */
-    public function getType()
+    protected function getStub()
     {
-        return 'factory';
+        $templatePath = $this->getTemplatePath();
+
+        return $templatePath . '/factory.stub';
     }
 
     /**
-     * Execute the command.
+     * Get the default namespace for the class.
      *
-     * @return void
+     * @param  string  $rootNamespace
+     * @return string
      */
-    public function handle()
+    protected function getDefaultNamespace($rootNamespace)
     {
-        parent::handle();
+        return config('generator.namespace_model', $rootNamespace);
+    }
 
-        $this->comment('\nGenerating factory for : '. implode(',', $this->tables));
+    /**
+     * Get the destination class path.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function getPath($name)
+    {
+        return config('generator.path_factory') . $this->argument('name') . 'Factory.php';
+    }
 
-        if ($this->option('models')) {
-            $this->models = explode(',', $this->option('models'));
-        }
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        $options = parent::getOptions();
 
-        $configData = $this->getConfigData();
-
-        $factoryGenerator = new FactoryGenerator($this);
-
-        foreach ($this->tables as $idx => $tableName) {
-            if (isset($this->models[$idx])) {
-                $modelName = $this->models[$idx];
-            } else {
-                $modelName = str_singular(studly_case($tableName));
-            }
-
-            $data = array_merge([
-                'TABLE_NAME' => $tableName,
-                'MODEL_NAME' => $modelName
-            ], $configData);
-            
-            $factoryGenerator->generate($data);
-        }
+        return array_merge($options, [
+            ['table', 't', InputOption::VALUE_OPTIONAL, 'Indicates if the model is created from the existed table.'],
+        ]);
     }
 }
