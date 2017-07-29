@@ -66,7 +66,12 @@ class PackageNewCommand extends Command
             $this->generateResource($this->option('model'), $rootNamespace, $relativePath, $packagePath);
         }
 
+        $this->info('Running composer dump-autoload. Please wait a minute.');
         $this->composer->dumpAutoloads();
+
+        $this->comment('Please copy the following line into config/app.php file.');
+        $this->info($rootNamespace . '\\' . studly_case($packageName) . 'PackageProvider::class');
+        $this->confirm('Have you done?', true);
         $this->info('Finished. Are you ready to write awesome package?');
     }
 
@@ -160,7 +165,8 @@ class PackageNewCommand extends Command
 
         $this->call('generator:make:view', [
             'name' => $model,
-            '--path' => $relativePath . '/src/resources/views'
+            '--path' => $relativePath . '/src/resources/views',
+            '--view' => $this->getViewNamespace($rootNamespace) . '::'
         ]);
     }
 

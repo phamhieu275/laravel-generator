@@ -2,9 +2,11 @@
 
 namespace Bluecode\Generator\Commands;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Bluecode\Generator\Traits\TemplateTrait;
+use Bluecode\Generator\Parser\SchemaParser;
 
 class ViewMakeCommand extends GeneratorCommand
 {
@@ -18,6 +20,19 @@ class ViewMakeCommand extends GeneratorCommand
     protected $name = 'generator:make:view';
 
     /**
+     * Create a new instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @return void
+     */
+    public function __construct(Filesystem $files, SchemaParser $schemaParser)
+    {
+        parent::__construct($files);
+
+        $this->schemaParser = $schemaParser;
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -28,6 +43,8 @@ class ViewMakeCommand extends GeneratorCommand
 
         return array_merge($options, [
             ['path', '', InputOption::VALUE_OPTIONAL, 'The location where the view file should be created.'],
+
+            ['view', '', InputOption::VALUE_OPTIONAL, 'The view namespace'],
         ]);
     }
 
@@ -57,19 +74,16 @@ class ViewMakeCommand extends GeneratorCommand
 
         $templatePath = $this->getStub();
 
-        $actions = ['index', 'create', 'edit', 'show'];
-        foreach ($actions as $action) {
-            $stub = $this->files->get($templatePath . "{$action}.blade.stub");
+        $replaces = $this->getReplace($name);
 
-            $method = 'build'.ucfirst($action);
-            if (method_exists($this, $method)) {
-                $stub = $this->{$method}($stub, $name);
-            }
+        $views = ['index', 'table', 'create', 'edit', 'show', 'form'];
+        foreach ($views as $view) {
+            $stub = $this->files->get($templatePath . "{$view}.blade.stub");
 
-            $path = $viewPath . "/{$action}.blade.php";
-            $this->files->put($path, $stub);
+            $path = $viewPath . "/{$view}.blade.php";
+            $this->files->put($path, str_replace(array_keys($replaces), array_values($replaces), $stub));
 
-            $this->info("{$action}.blade.php is created successfully.");
+            $this->info("{$view}.blade.php is created successfully.");
         }
     }
 
@@ -91,98 +105,101 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Builds an index.
+     * get view folder path
      *
-     * @param string $stub The stub
-     * @param string $name The name
-     * @return string The index.
+     * @param string $modelInput The model class
+     * @return string
      */
-    private function buildIndex($stub, $name)
+    protected function getViewPath($modelClass)
     {
-        $placeholders = [
-            'DummyMainLayout',
-            'DummyResourceUrl',
-            'DummyModelPluralVariable',
-            'DummyModelVariable',
-        ];
+        $viewFolder = str_plural(snake_case(class_basename($modelClass)));
 
+        if ($this->option('view')) {
+            return $this->option('view') . $viewFolder;
+        }
+
+        return $viewFolder;
+    }
+
+    protected function getReplace($name)
+    {
         $replaces = [
-            config('generator.main_layout'),
-            str_plural(snake_case($name)),
-            str_plural(lcfirst($name)),
-            strtolower($name),
+            'DummyMainLayout' => config('generator.main_layout'),
+            'DummyResourceUrl' => str_plural(snake_case($name)),
+            'DummyModelPluralVariable' => str_plural(lcfirst($name)),
+            'DummyModelVariable' => strtolower($name),
+            'DummyViewPath' => $this->getViewPath($name),
+            'DummyTableHead' => '',
+            'DummyTableBody' => '',
+            'DummyFormInputs' => ''
         ];
 
-        return str_replace($placeholders, $replaces, $stub);
+        $tableName = str_plural(snake_case($name));
+        $fields = $this->schemaParser->getFillableFields($tableName);
+
+        if ($fields->isEmpty()) {
+            return $replaces;
+        }
+
+        $headerColumns = $bodyColumns = [];
+        foreach ($fields->keys()->all() as $field) {
+            $headerColumns[] = '<th>' . title_case(str_replace('_', ' ', $field)) . '</th>';
+            $bodyColumns[] = '<td>{!! $' . $replaces['DummyModelVariable'] . '->' . $field . ' !!}</td>';
+        }
+
+        $glue = '\n' . str_repeat(' ', 16);
+        $replaces['DummyTableHead'] = implode($glue, $headerColumns);
+        $replaces['DummyTableBody'] = implode($glue, $bodyColumns);
+
+        $replaces['DummyFormInputs'] = $this->buildFormInputs($fields);
+
+        return $replaces;
     }
 
     /**
-     * Builds a create.
+     * Builds form inputs.
      *
-     * @param string $stub The stub
-     * @param string $name The name
-     * @return string The create.
+     * @param \Illuminate\Support\Collection $fields The fields
+     * @return string
      */
-    private function buildCreate($stub, $name)
+    private function buildFormInputs($fields)
     {
+        $fieldTemplate = $this->files->get($this->getStub() . 'form_field.blade.stub');
+
+        $inputs = [];
         $placeholders = [
-            'DummyMainLayout',
-            'DummyResourceUrl',
-            'DummyModelVariable',
+            'DummyFieldName',
+            'DummyInputLabel',
+            'DummyInputType',
         ];
+        foreach ($fields as $field) {
+            switch ($field->getType()->getName()) {
+                case 'integer':
+                    $inputType = 'number';
+                    break;
+                case 'text':
+                    $inputType = 'textarea';
+                    break;
+                case 'date':
+                    $inputType = 'date';
+                    break;
+                case 'boolean':
+                    $inputType = 'checkbox';
+                    break;
+                default:
+                    $inputType = 'text';
+                    break;
+            }
 
-        $replaces = [
-            config('generator.main_layout'),
-            str_plural(snake_case($name)),
-            strtolower($name),
-        ];
+            $replaces = [
+                $field->getName(),
+                title_case(str_replace('_', ' ', $field->getName())),
+                $inputType
+            ];
 
-        return str_replace($placeholders, $replaces, $stub);
-    }
+            $inputs[] = str_replace($placeholders, $replaces, $fieldTemplate);
+        }
 
-    /**
-     * Builds an edit.
-     *
-     * @param string $stub The stub
-     * @param string $name The name
-     * @return string The edit.
-     */
-    private function buildEdit($stub, $name)
-    {
-        $placeholders = [
-            'DummyMainLayout',
-            'DummyResourceUrl',
-            'DummyModelVariable',
-        ];
-
-        $replaces = [
-            config('generator.main_layout'),
-            str_plural(snake_case($name)),
-            strtolower($name),
-        ];
-
-        return str_replace($placeholders, $replaces, $stub);
-    }
-
-    /**
-     * Builds a show.
-     *
-     * @param string $stub The stub
-     * @param string $name The name
-     * @return string The show.
-     */
-    private function buildShow($stub, $name)
-    {
-        $placeholders = [
-            'DummyMainLayout',
-            'DummyModelVariable',
-        ];
-
-        $replaces = [
-            config('generator.main_layout'),
-            strtolower($name),
-        ];
-
-        return str_replace($placeholders, $replaces, $stub);
+        return implode('\n\n', $inputs);
     }
 }

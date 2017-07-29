@@ -8,31 +8,11 @@
     </div>
 
     <div class="row">
-    @unless ($DummyModelPluralVariable->isEmpty())
-        <table class="table">
-            <thead>
-                <th></th>
-            </thead>
-            <tbody>
-                @foreach($DummyModelPluralVariable as $DummyModelVariable)
-                <tr>
-                    <td>
-                        {!! link_to_route('DummyResourceUrl.edit', 'Edit', [$DummyModelVariable->id], ['class' => 'btn btn-primary pull-left']) !!}
-                        {!! Form::open([
-                            'route' => ['DummyResourceUrl.destroy', $DummyModelVariable->id],
-                            'method' => 'DELETE',
-                            'onSubmit' => "return confirm('Are you sure wants to delete this record ?')",
-                        ]) !!}
-                        {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}
-                        {!! Form::close() !!}
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @else
+    @if ($DummyModelPluralVariable->isEmpty())
         <div class="well text-center">No record found.</div>
-    @endunless
+    @else
+        @include('DummyViewPath.table')
+    @endif
     </div>
 
     <div class="row">

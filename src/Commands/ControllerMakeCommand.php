@@ -58,7 +58,7 @@ class ControllerMakeCommand extends BaseControllerMakeCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         if ($this->option('namespace')) {
-            return trim($this->option('namespace'), '\\') . '\Http\Controller';
+            return trim($this->option('namespace'), '\\') . '\Http\Controllers';
         }
 
         return config('generator.namespace_controller');
@@ -72,7 +72,7 @@ class ControllerMakeCommand extends BaseControllerMakeCommand
     protected function rootNamespace()
     {
         if ($this->option('namespace')) {
-            return $this->option('namespace');
+            return trim($this->option('namespace'), '\\') . '\\';
         }
 
         return parent::rootNamespace();
@@ -105,12 +105,14 @@ class ControllerMakeCommand extends BaseControllerMakeCommand
 
         $placeholders = [
             'DummyModelPluralVariable',
-            'DummyViewPath'
+            'DummyViewPath',
+            'DummyResourceUrl'
         ];
 
         $replaces = [
             str_plural(lcfirst(class_basename($modelClass))),
-            $this->getViewPath($modelClass)
+            $this->getViewPath($modelClass),
+            str_plural(snake_case(class_basename($modelClass))),
         ];
 
         return str_replace(
