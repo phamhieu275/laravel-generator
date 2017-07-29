@@ -1,0 +1,10 @@
+@extends('DummyMainLayout')
+
+@section('content')
+<div class="container">
+
+    {!! Form::open(['route' => 'DummyResourceUrl.store', 'class' => 'form-horizontal']) !!}
+
+    {!! Form::close() !!}
+</div>
+@endsection

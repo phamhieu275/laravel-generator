@@ -1,4 +1,4 @@
-Laravel Resource Generator (Laravel5.1)
+Laravel Resource Generator (Laravel5.4)
 ======================= 
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d70b34f6a08144f18d8dedd6da92f1db)](https://www.codacy.com/app/matmaxanh/laravel-generator?utm_source=github.com&utm_medium=referral&utm_content=matmaxanh/laravel-generator&utm_campaign=badger)

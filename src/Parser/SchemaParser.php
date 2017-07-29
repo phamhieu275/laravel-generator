@@ -1,4 +1,6 @@
-<?php namespace Bluecode\Generator\Parser;
+<?php
+
+namespace Bluecode\Generator\Parser;
 
 use DB;
 
@@ -68,39 +70,23 @@ class SchemaParser
         return $this->foreignKeyParser->generate($table, $this->schema);
     }
 
-    public function getFillableFieldsFromSchema($schema)
-    {
-        $fillableFields = [];
-        foreach ($schema as $fieldName => $column) {
-            if (empty($column['field']) || in_array($column['field'], $this->guardFields)) {
-                continue;
-            }
-
-            if (in_array($column['type'], [
-                'unique',
-                'tinyIncrements',
-                'smallIncrements',
-                'mediumIncrements',
-                'increments',
-                'bigIncrements'
-            ])) {
-                continue;
-            }
-
-            if (in_array($column['type'], ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger']) &&
-                isset($column['args']) &&
-                $column['args'] === 'true') {
-                continue;
-            }
-            $fillableFields[$fieldName] = $column;
-        }
-
-        return $fillableFields;
-    }
-
     public function getFillableFields($table)
     {
-        $schema = $this->getFields($table);
-        return $this->getFillableFieldsFromSchema($schema);
+        $columns = $this->schema->listTableColumns($table);
+        return collect($columns)
+            ->filter(function ($column) {
+                return ! $column->getAutoincrement() && ! in_array($column->getName(), $this->guardFields);
+            });
+    }
+
+    public function hasSoftDelete($table)
+    {
+        $schema = $this->schema->listTableColumns($table);
+        return isset($schema['deleted_at']) && $schema['deleted_at']->getType()->getName() === 'datetime';
+    }
+
+    public function isExist($table)
+    {
+        return $this->schema->tablesExist([$table]);
     }
 }

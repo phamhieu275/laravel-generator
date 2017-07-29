@@ -1,77 +1,186 @@
-<?php namespace Bluecode\Generator\Commands;
+<?php
 
-use Bluecode\Generator\Generators\ModelGenerator;
+namespace Bluecode\Generator\Commands;
 
-class ModelMakeCommand extends GeneratorCommand
+use Illuminate\Foundation\Console\ModelMakeCommand as BaseModelMakeCommand;
+use Symfony\Component\Console\Input\InputOption;
+use Bluecode\Generator\Parser\SchemaParser;
+use Bluecode\Generator\Traits\TemplateTrait;
+
+class ModelMakeCommand extends BaseModelMakeCommand
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'generator:make:model
-                                {tables?} : List table name for generate model files.}
-                                {--tables= : List table name for generate model files.}
-                                {--ignore= : List ignore table name.}
-                                {--models= : List model name for generate.}
-                                {--auth : Use Authenticatable, Authorizable, CanResetPassword trait}';
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Create a model file with validation and relationships for given table.';
-    /**
-     * A list model name for generate
-     *
-     * @var array
-     */
-    public $models = [];
+    use TemplateTrait;
 
     /**
-     * Get the type of command
+     * The name of the console command.
      *
-     * @return string
+     * @var string
      */
-    public function getType()
+    protected $name = 'generator:make:model';
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
     {
-        return 'model';
+        $options = parent::getOptions();
+
+        return array_merge($options, [
+            ['softDelete', 'd', InputOption::VALUE_NONE, 'Indicates if the model uses the soft delete trait.'],
+
+            ['table', 't', InputOption::VALUE_OPTIONAL, 'Indicates if the model is created from the existed table.'],
+
+            ['namespace', '', InputOption::VALUE_OPTIONAL, 'The root namespace of model class.'],
+
+            ['path', '', InputOption::VALUE_OPTIONAL, 'The location where the model file should be created.'],
+        ]);
     }
 
     /**
-     * Execute the command.
+     * Get the stub file for the generator.
      *
-     * @return void
+     * @return string
      */
-    public function handle()
+    protected function getStub()
     {
-        parent::handle();
+        $templatePath = $this->getTemplatePath();
 
-        if ($this->option('models')) {
-            $this->models = explode(',', $this->option('models'));
+        if ($this->option('softDelete')) {
+            return $templatePath . '/model.softDelete.stub';
         }
 
-        // TODO: compare the length option
+        return $templatePath . '/model.stub';
+    }
 
-        $this->comment('Generating models for: '. implode(',', $this->tables));
-
-        $configData = $this->getConfigData();
-
-        $modelGenerator = new ModelGenerator($this);
-
-        foreach ($this->tables as $idx => $tableName) {
-            if (isset($this->models[$idx])) {
-                $modelName = $this->models[$idx];
-            } else {
-                $modelName = str_singular(studly_case($tableName));
-            }
-
-            $data = array_merge([
-                'TABLE_NAME' => $tableName,
-                'MODEL_NAME' => $modelName
-            ], $configData);
-            
-            $modelGenerator->generate($data);
+    /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        if ($this->option('namespace')) {
+            return $this->option('namespace') . '\Models';
         }
+
+        return config('generator.namespace_model');
+    }
+
+    /**
+     * Get the root namespace for the class.
+     *
+     * @return string
+     */
+    protected function rootNamespace()
+    {
+        if ($this->option('namespace')) {
+            return $this->option('namespace');
+        }
+
+        return parent::rootNamespace();
+    }
+
+    /**
+     * Get the destination class path.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function getPath($name)
+    {
+        if ($this->option('path')) {
+            return trim($this->option('path'), '/') . '/' . $this->argument('name') . '.php';
+        }
+
+        return parent::getPath($name);
+    }
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $stub = parent::buildClass($name);
+
+        $this->replaceTableName($stub)
+            ->replaceFillable($stub);
+
+        return $stub;
+    }
+
+    /**
+     * Replace table name
+     *
+     * @param string $stub The template content
+     * @return string
+     */
+    protected function replaceTableName(&$stub)
+    {
+        $tableName = $this->getTableName();
+
+        $stub = str_replace('DummyTableName', $tableName, $stub);
+
+        return $this;
+    }
+
+    /**
+     * Replace fillable fields
+     *
+     * @param string $stub The template content
+     * @return string
+     */
+    protected function replaceFillable(&$stub)
+    {
+        $tableName = $this->getTableName();
+        $fillable = $this->getFillable($tableName);
+
+        $stub = str_replace('DummyFillable', $fillable, $stub);
+
+        return $this;
+    }
+
+    /**
+     * Gets the table name.
+     *
+     * @return string The table name.
+     */
+    protected function getTableName()
+    {
+        if (isset($this->tableName)) {
+            return $this->tableName;
+        }
+
+        $this->tableName = trim($this->option('table'));
+
+        if (empty($this->tableName)) {
+            $this->tableName = str_plural(snake_case($this->argument('name')));
+        }
+
+        return $this->tableName;
+    }
+
+    /**
+     * Gets fillable fields from database schema
+     *
+     * @param string $tableName The table name
+     * @return string The fillable.
+     */
+    protected function getFillable($tableName)
+    {
+        $schemaParser = new SchemaParser;
+        $fields = $schemaParser->getFillableFields($tableName);
+
+        return $fields
+            ->map(function ($field) {
+                return "'{$field->getName()}'";
+            })
+            ->flatten()
+            ->implode(', ');
     }
 }

@@ -16,6 +16,8 @@ class GeneratorServiceProvider extends ServiceProvider
         $this->publishes([
             $configPath => config_path('generator.php'),
         ]);
+
+        $this->mergeConfigFrom($configPath, 'generator');
     }
 
     /**
@@ -26,12 +28,15 @@ class GeneratorServiceProvider extends ServiceProvider
     public function register()
     {
         $this->commands(
-            'Bluecode\Generator\Commands\PublishCommand',
+            'Bluecode\Generator\Commands\PublishTemplateCommand',
             'Bluecode\Generator\Commands\MigrationMakeCommand',
             'Bluecode\Generator\Commands\ModelMakeCommand',
-            'Bluecode\Generator\Commands\ScaffoldMakeCommand',
+            'Bluecode\Generator\Commands\ControllerMakeCommand',
+            'Bluecode\Generator\Commands\ViewMakeCommand',
             'Bluecode\Generator\Commands\FactoryMakeCommand',
-            'Bluecode\Generator\Commands\ResourceMakeCommand'
+            'Bluecode\Generator\Commands\ProviderMakeCommand',
+            'Bluecode\Generator\Commands\ResourceMakeCommand',
+            'Bluecode\Generator\Commands\PackageNewCommand'
         );
     }
 }

@@ -1,0 +1,10 @@
+@extends('DummyMainLayout')
+
+@section('content')
+<div class="container">
+
+    {!! Form::model($DummyModelVariable, ['route' => ['DummyResourceUrl.update', $DummyModelVariable->id], 'method' => 'patch', 'class' => 'form-horizontal']) !!}
+
+    {!! Form::close() !!}
+</div>
+@endsection

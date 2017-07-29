@@ -1,4 +1,6 @@
-<?php namespace Bluecode\Generator\Commands;
+<?php
+
+namespace Bluecode\Generator\Commands;
 
 use Illuminate\Console\Command;
 
@@ -9,17 +11,13 @@ class ResourceMakeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'generator:make:resource
-                                {tables?} : List table name for generate resource files.}
-                                {--tables= : List table name for generate resource files.}
-                                {--ignore= : List ignore table name.}
-                                {--models= : List model name for seed.}';
+    protected $signature = 'generator:make:resource {name : The model class name}';
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create migration, CRUD, factory for given table.';
+    protected $description = 'Create crud for given table.';
 
     /**
      * Execute the command.
@@ -28,18 +26,15 @@ class ResourceMakeCommand extends Command
      */
     public function handle()
     {
-        $params = [
-            'tables'   => $this->argument('tables'),
-            '--tables' => $this->option('tables'),
-            '--ignore' => $this->option('ignore'),
-        ];
+        $arguments = $this->arguments();
 
-        $this->call('generator:make:migration', $params);
+        $this->call('generator:make:model', $arguments);
 
-        $params['--models'] = $this->option('models');
+        $this->call('generator:make:controller', [
+            'name' => $arguments['name'] . 'Controller',
+            '--model' => config('generator.namespace_model') . '\\' . $arguments['name']
+        ]);
 
-        $this->call('generator:make:scaffold', $params);
-
-        $this->call('generator:make:factory', $params);
+        $this->call('generator:make:view', $arguments);
     }
 }

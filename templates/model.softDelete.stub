@@ -1,0 +1,25 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyModelExtendClass as Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class DummyClass extends Model
+{
+    use SoftDeletes;
+
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = "DummyTableName";
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [DummyFillable];
+}

@@ -1,0 +1,5 @@
+<!-- DummyFieldName Field -->
+<div class="form-group">
+    {!! Form::label('DummyFieldName', 'DummyFieldName:') !!}
+    <p>{!! $DummyModelVariable->DummyFieldName !!}</p>
+</div>
