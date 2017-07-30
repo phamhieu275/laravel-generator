@@ -14,6 +14,8 @@ class IndexParser
     protected $multiFieldIndexes;
 
     /**
+     * Initial new instance
+     *
      * @param string                                      $table Table Name
      * @param \Doctrine\DBAL\Schema\AbstractSchemaManager $schema
      * @param bool                                        $ignoreIndexNames
@@ -38,6 +40,8 @@ class IndexParser
 
 
     /**
+     * convert the index to array
+     *
      * @param string $table
      * @param \Doctrine\DBAL\Schema\Index $index
      * @return array
@@ -51,7 +55,11 @@ class IndexParser
         } else {
             $type = 'index';
         }
-        $array = ['type' => $type, 'name' => null, 'columns' => $index->getColumns()];
+        $array = [
+            'type' => $type,
+            'name' => null,
+            'columns' => $index->getColumns()
+        ];
 
         if (!$this->isDefaultIndexName($table, $index->getName(), $type, $index->getColumns())) {
             $array['name'] = $index->getName();
@@ -67,19 +75,21 @@ class IndexParser
      */
     protected function getDefaultIndexName($table, $type, $columns)
     {
-        if ($type=='primary') {
+        if ($type == 'primary') {
             return 'PRIMARY';
         }
         if (is_array($columns)) {
             $columns = implode('_', $columns);
         }
-        return $table .'_'. $columns .'_'. $type;
+        return $table . '_' . $columns . '_' . $type;
     }
 
     /**
-     * @param string       $table   Table Name
-     * @param string       $name    Current Name
-     * @param string       $type    Index Type
+     * Determines if default index name.
+     *
+     * @param string $table Table Name
+     * @param string $name Current Name
+     * @param string $type Index Type
      * @param string|array $columns Column Names
      * @return bool
      */
@@ -90,6 +100,8 @@ class IndexParser
 
 
     /**
+     * Gets the index.
+     *
      * @param string $name
      * @return null|object
      */
@@ -102,6 +114,8 @@ class IndexParser
     }
 
     /**
+     * Gets the multi field indexes.
+     *
      * @return null|object
      */
     public function getMultiFieldIndexes()

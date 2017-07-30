@@ -39,8 +39,8 @@ class PublishTemplateCommand extends Command
     /**
      * Make directory and copy files
      *
-     * @param <type> $sourceDir The source dir
-     * @param <type> $destinationDir The destination dir
+     * @param string $sourceDir The source dir
+     * @param string $destinationDir The destination dir
      * @param string $dirName The dir name
      * @return void
      */

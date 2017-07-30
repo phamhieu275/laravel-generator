@@ -10,7 +10,6 @@ trait InteractsWithUserTrait
      * Get vendor part of the namespace part.
      *
      * @param string $default
-     *
      * @return string
      */
     protected function getVendor($default = '')
@@ -24,7 +23,6 @@ trait InteractsWithUserTrait
      * Get the name of package for the namespace.
      *
      * @param string $default
-     *
      * @return string
      */
     protected function getPackage($default = '')
@@ -38,7 +36,6 @@ trait InteractsWithUserTrait
      * Get vendor folder name.
      *
      * @param string $vendor
-     *
      * @return string
      */
     protected function getVendorFolderName($vendor)
@@ -52,7 +49,6 @@ trait InteractsWithUserTrait
      * Get package folder name.
      *
      * @param string $package
-     *
      * @return string
      */
     protected function getPackageFolderName($package)
@@ -65,9 +61,8 @@ trait InteractsWithUserTrait
     /**
      * Ask user.
      *
-     * @param $question
-     * @param $defaultValue
-     *
+     * @param string $question The question
+     * @param string $defaultValue The default value
      * @return string
      */
     protected function askUser($question, $defaultValue = '')

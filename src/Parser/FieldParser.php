@@ -173,17 +173,23 @@ class FieldParser
     }
 
     /**
+     * Get the length of a field
+     *
      * @param int $length
-     * @return int|void
+     * @return int|null
      */
     protected function getLength($length)
     {
         if ($length and $length !== 255) {
             return $length;
         }
+
+        return null;
     }
 
     /**
+     * Ge the default value of a field
+     *
      * @param string $default
      * @param string $type
      * @return string
@@ -202,6 +208,8 @@ class FieldParser
     }
 
     /**
+     * Get the precision value
+     *
      * @param int $precision
      * @param int $scale
      * @return string|void
@@ -218,6 +226,8 @@ class FieldParser
     }
 
     /**
+     * Convert arguments to string
+     *
      * @param string|array $args
      * @param string       $quotes
      * @return string
@@ -234,6 +244,7 @@ class FieldParser
 
     /**
      * Get Decorator
+     *
      * @param string       $function
      * @param string|array $args
      * @param string       $quotes
@@ -250,6 +261,8 @@ class FieldParser
     }
 
     /**
+     * Get the information of index
+     *
      * @param IndexParser $indexParser
      * @return array
      */

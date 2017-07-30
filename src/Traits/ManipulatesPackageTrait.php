@@ -11,7 +11,6 @@ trait ManipulatesPackageTrait
      * Create package folder.
      *
      * @param string $packagePath
-     *
      * @throws RuntimeException
      */
     protected function createPackageFolder($packagePath)
@@ -38,7 +37,7 @@ trait ManipulatesPackageTrait
     /**
      * Remove package folder.
      *
-     * @param $packagePath
+     * @param string $packagePath The package path
      * @throws RuntimeException
      * @return void
      */
@@ -55,41 +54,5 @@ trait ManipulatesPackageTrait
         } else {
             $this->info('Package folder does not exists. Skipping.');
         }
-    }
-
-    /**
-     * Creates a composer file.
-     *
-     * @param string $templatePath The template path
-     * @param string $packagePath The package path
-     * @param string $packageName The package name
-     * @return void
-     */
-    protected function createComposerFile($templatePath, $packagePath, $packageName)
-    {
-        $path = $templatePath . '/package/composer.json.stub';
-
-        $content = str_replace('DummyPackageName', $packageName, File::get($path));
-
-        File::put($packagePath . '/composer.json', $content);
-
-        $this->info('composer.json created successfully.');
-    }
-
-    /**
-     * Creates a route file.
-     *
-     * @param string $packagePath The package path
-     * @return void
-     */
-    protected function createRouteFile($packagePath)
-    {
-        if (File::exists($packagePath . '/src/routes.php')) {
-            return;
-        }
-
-        File::put($packagePath . '/src/routes.php', '');
-
-        $this->info('routes.php created successfully.');
     }
 }

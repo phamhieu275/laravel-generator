@@ -127,7 +127,7 @@ class ViewMakeCommand extends GeneratorCommand
             'DummyMainLayout' => config('generator.main_layout'),
             'DummyResourceUrl' => str_plural(snake_case($name)),
             'DummyModelPluralVariable' => str_plural(lcfirst($name)),
-            'DummyModelVariable' => strtolower($name),
+            'DummyModelVariable' => camel_case($name),
             'DummyViewPath' => $this->getViewPath($name),
             'DummyTableHead' => '',
             'DummyTableBody' => '',
@@ -157,7 +157,7 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Builds form inputs.
+     * Build form inputs.
      *
      * @param \Illuminate\Support\Collection $fields The fields
      * @return string

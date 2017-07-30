@@ -146,7 +146,7 @@ class ControllerMakeCommand extends BaseControllerMakeCommand
     }
 
     /**
-     * get view folder path
+     * Get view folder path
      *
      * @param string $modelInput The model class
      * @return string
@@ -177,9 +177,13 @@ class ControllerMakeCommand extends BaseControllerMakeCommand
         $model = trim(str_replace('/', '\\', $model), '\\');
 
         if ($this->option('namespace')) {
-            $rootNamespace = $this->option('namespace');
+            $rootNamespace = trim($this->option('namespace'), '\\') . '\\';
         } else {
             $rootNamespace = $this->laravel->getNamespace();
+        }
+
+        if (class_exists($model)) {
+            return $model;
         }
 
         if (! Str::startsWith($model, $rootNamespace)) {

@@ -1,0 +1,7 @@
+<?php
+
+Route::middleware(['web'])
+->namespace('DummyNamespaceController')
+->group(function () {
+    Route::resource('DummyResourceUrl', 'DummyController');
+});

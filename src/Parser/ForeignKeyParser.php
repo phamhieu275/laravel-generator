@@ -41,8 +41,9 @@ class ForeignKeyParser
     }
 
     /**
-     * @param      $foreignKey
+     * Get the name of foreign key
      *
+     * @param      $foreignKey
      * @return null
      */
     private function getName($foreignKey)
@@ -54,8 +55,10 @@ class ForeignKeyParser
     }
 
     /**
-     * @param $foreignKey
+     * Determines if default name.
      *
+     * @param string $foreignKey The foreign key
+     * @param $foreignKey
      * @return bool
      */
     private function isDefaultName($foreignKey)
