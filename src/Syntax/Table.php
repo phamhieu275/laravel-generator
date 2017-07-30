@@ -13,6 +13,13 @@ abstract class Table
      */
     protected $table;
 
+    /**
+     * Get the schema of the specify table.
+     *
+     * @param string $fields The fields
+     * @param string $table The table
+     * @return string
+     */
     public function run($fields, $table)
     {
         $this->table = $table;
@@ -36,12 +43,17 @@ abstract class Table
     }
 
     /**
+     * Gets the item.
+     *
      * @param array $item
      * @return string
      */
     abstract protected function getItem($item);
 
     /**
+     * Adds decorators.
+     *
+     * @param string $decorators The decorators
      * @param $decorators
      * @return string
      */

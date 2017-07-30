@@ -4,6 +4,7 @@ namespace Bluecode\Generator\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
+use Illuminate\Filesystem\Filesystem;
 use Bluecode\Generator\Traits\TemplateTrait;
 use Bluecode\Generator\Traits\ManipulatesPackageTrait;
 use Bluecode\Generator\Traits\InteractsWithUserTrait;
@@ -23,8 +24,8 @@ class PackageNewCommand extends Command
         {vendor : The vendor part of the namespace}
         {package : The name of package for the namespace}
         {--i|interactive : Interactive mode}
-        {--model= : The model class name}
-        {--path= : The location where the package should be created.}';
+        {--path= : The location where the package should be created.}
+        {--model= : The model class name}';
 
     /**
      * The console command description.
@@ -39,11 +40,12 @@ class PackageNewCommand extends Command
      * @param  \Illuminate\Support\Composer  $composer
      * @return void
      */
-    public function __construct(Composer $composer)
+    public function __construct(Composer $composer, Filesystem $files)
     {
         parent::__construct();
 
         $this->composer = $composer;
+        $this->files = $files;
     }
 
     /**
@@ -82,7 +84,7 @@ class PackageNewCommand extends Command
      * @param string $packageName The package name
      * @return string
      */
-    private function getRelativePath($vendorName, $packageName)
+    protected function getRelativePath($vendorName, $packageName)
     {
         if ($this->option('path')) {
             return trim($this->option('path'), '/');
@@ -100,7 +102,7 @@ class PackageNewCommand extends Command
      * @param string $relativePath The relative path
      * @return string
      */
-    private function getPackagePath($relativePath)
+    protected function getPackagePath($relativePath)
     {
         return config('generator.package_base_path') . '/' . $relativePath;
     }
@@ -118,7 +120,7 @@ class PackageNewCommand extends Command
     {
         $this->createPackageFolder($packagePath);
 
-        $this->createComposerFile($this->getTemplatePath(), $packagePath, $packageName);
+        $this->createComposerFile($packagePath, $packageName);
 
         $providerArguments = [
             'name' => studly_case($packageName) . 'PackageProvider',
@@ -136,6 +138,28 @@ class PackageNewCommand extends Command
     }
 
     /**
+     * Creates a composer file.
+     *
+     * @param string $packagePath The package path
+     * @param string $packageName The package name
+     * @return void
+     */
+    private function createComposerFile($packagePath, $packageName)
+    {
+        $filePath = $packagePath . '/composer.json';
+        if ($this->files->exists($filePath)) {
+            return;
+        }
+
+        $stubPath = $this->getTemplatePath() . '/package/composer.json.stub';
+        $stub = str_replace('DummyPackageName', $packageName, $this->files->get($stubPath));
+
+        $this->files->put($filePath, $stub);
+
+        $this->info('composer.json created successfully.');
+    }
+
+    /**
      * Generate CRUD with given model name
      *
      * @param string $model The model
@@ -146,38 +170,76 @@ class PackageNewCommand extends Command
      */
     private function generateResource($model, $rootNamespace, $relativePath, $packagePath)
     {
-        $this->createRouteFile($packagePath);
+        $this->createRouteFile($packagePath, $model, $rootNamespace);
 
-        $this->call('generator:make:model', [
-            'name' => $model,
-            '--namespace' => $rootNamespace,
-            '--path' => $relativePath . '/src/Models'
-        ]);
+        if (! class_exists($model)) {
+            $this->call('generator:make:model', [
+                'name' => $model,
+                '--namespace' => $rootNamespace,
+                '--path' => $relativePath . '/src/Models'
+            ]);
+        }
 
         $this->call('generator:make:controller', [
-            'name' => $model . 'Controller',
+            'name' => studly_case(class_basename($model)) . 'Controller',
             '--namespace' => $rootNamespace,
             '--path' => $relativePath . '/src/Http/Controllers',
-            '--model' => $rootNamespace . '\Models\\' . $model,
+            '--model' => $model,
             '--skipCheckModel' => true,
             '--view' => $this->getViewNamespace($rootNamespace) . '::'
         ]);
 
         $this->call('generator:make:view', [
-            'name' => $model,
+            'name' => class_basename($model),
             '--path' => $relativePath . '/src/resources/views',
             '--view' => $this->getViewNamespace($rootNamespace) . '::'
         ]);
     }
 
     /**
-     * Gets the view namespace.
+     * Creates a route file.
+     *
+     * @param string $packagePath The package path
+     * @param string $model The model
+     * @param string $rootNamespace The root namespace
+     * @return void
+     */
+    private function createRouteFile($packagePath, $model, $rootNamespace)
+    {
+        $filePath = $packagePath . '/src/routes.php';
+        if ($this->files->exists($filePath)) {
+            return;
+        }
+
+        $stubPath = $this->getTemplatePath() . '/package/routes.stub';
+        $stub = $this->files->get($stubPath);
+
+        $modelClass = class_basename($model);
+        $replaces = [
+            'DummyNamespaceController' => $rootNamespace . '\\Http\\Controllers',
+            'DummyResourceUrl' => str_plural(snake_case($modelClass)),
+            'DummyController' => studly_case($modelClass) . 'Controller',
+        ];
+        $stub = str_replace(array_keys($replaces), array_values($replaces), $stub);
+
+        $this->files->put($filePath, $stub);
+
+        $this->info('routes.php created successfully.');
+    }
+
+    /**
+     * Get the view namespace.
      *
      * @param string $rootNamespace The root namespace
      * @return string
      */
     private function getViewNamespace($rootNamespace)
     {
-        return strtolower(str_replace('\\', '.', $rootNamespace));
+        return collect(explode('\\', $rootNamespace))
+            ->map(function ($name) {
+                return snake_case($name);
+            })
+            ->flatten()
+            ->implode('.');
     }
 }

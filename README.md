@@ -1,5 +1,5 @@
 Laravel Resource Generator (Laravel5.4)
-======================= 
+=======================
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d70b34f6a08144f18d8dedd6da92f1db)](https://www.codacy.com/app/matmaxanh/laravel-generator?utm_source=github.com&utm_medium=referral&utm_content=matmaxanh/laravel-generator&utm_campaign=badger)
 
@@ -40,18 +40,18 @@ Documentation
 ## Installation
 
 1. Add this package to your composer.json:
-  
+
         "require": {
             "doctrine/dbal": "^2.5",
             "laracasts/flash": "dev-master",
             "laravelcollective/html": "5.1.*@dev",
             "bluecode/laravel-generator": "dev-master"
         }
-  
+
 2. Run composer update
 
         composer update
-    
+
 3. Add the ServiceProviders to the providers array in ```config/app.php```.<br>
    As we are using these two packages [laravelcollective/html](https://github.com/LaravelCollective/html) & [laracasts/flash](https://github.com/laracasts/flash) as a dependency.<br>
    so we need to add those ServiceProviders as well.
@@ -59,7 +59,7 @@ Documentation
 		Collective\Html\HtmlServiceProvider::class,
 		Laracasts\Flash\FlashServiceProvider::class,
 		Bluecode\Generator\GeneratorServiceProvider::class,
-        
+
    Also for convenience, add these facades in alias array in ```config/app.php```.
 
 		'Form'      => Collective\Html\FormFacade::class,
@@ -71,7 +71,7 @@ Documentation
 Publish Configuration file ```generator.php```.
 
         php artisan vendor:publish
-        
+
 Config file (```config/generator.php```) contains path for all generated files
 
 ```base_controller``` - Base Controller for all Controllers<br>
@@ -121,11 +121,11 @@ This package require you to pass at least one argument for table name.
 If you want to pass many table name, a list table name will separate by comma.
 
 Generate Migration From Exist Tables:
-  
+
         php artisan generator:make:migrate TableName
 
 Generate CRUD Scaffold:
- 
+
         php artisan generator:make:scaffold TableName
 
 Generate Model With Validation And Relationships:
@@ -139,12 +139,12 @@ Generate Factory From Exist Tables:
 Generate All Resource File:
 
         php artisan generator:make:resource TableName
-        
+
 e.g.
     php artisan generator:migrate
     php artisan generator:migrate posts,comments
 
-    php artisan generator:make:model 
+    php artisan generator:make:model
     php artisan generator:make:model posts,comments
     php artisan generator:make:model --tables=posts,comments
     php artisan generator:make:model --ignore=posts,comments
