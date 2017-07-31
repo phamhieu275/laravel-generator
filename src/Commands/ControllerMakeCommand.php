@@ -35,6 +35,8 @@ class ControllerMakeCommand extends BaseControllerMakeCommand
             ['skipCheckModel', '', InputOption::VALUE_NONE, 'Skip to check whether the model class is exist'],
 
             ['view', '', InputOption::VALUE_OPTIONAL, 'The view namespace'],
+
+            ['package', '', InputOption::VALUE_OPTIONAL, 'The package name'],
         ]);
     }
 
@@ -103,21 +105,17 @@ class ControllerMakeCommand extends BaseControllerMakeCommand
     {
         $modelClass = $this->parseModel($this->option('model'));
 
-        $placeholders = [
-            'DummyModelPluralVariable',
-            'DummyViewPath',
-            'DummyResourceUrl'
-        ];
+        $modelName = class_basename($modelClass);
 
         $replaces = [
-            str_plural(lcfirst(class_basename($modelClass))),
-            $this->getViewPath($modelClass),
-            str_plural(snake_case(class_basename($modelClass))),
+            'DummyModelPluralVariable'=> str_plural(lcfirst($modelName)),
+            'DummyViewPath' => $this->getViewPath($modelClass),
+            'DummyResourceName' => $this->getResourceName($modelName, $this->option('package')),
         ];
 
         return str_replace(
-            $placeholders,
-            $replaces,
+            array_keys($replaces),
+            array_values($replaces),
             parent::buildClass($name)
         );
     }

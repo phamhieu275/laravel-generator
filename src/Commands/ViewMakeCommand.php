@@ -45,6 +45,8 @@ class ViewMakeCommand extends GeneratorCommand
             ['path', '', InputOption::VALUE_OPTIONAL, 'The location where the view file should be created.'],
 
             ['view', '', InputOption::VALUE_OPTIONAL, 'The view namespace'],
+
+            ['package', '', InputOption::VALUE_OPTIONAL, 'The package name'],
         ]);
     }
 
@@ -66,15 +68,15 @@ class ViewMakeCommand extends GeneratorCommand
      */
     public function fire()
     {
-        $name = $this->argument('name');
-        $viewPath = $this->getPath($name);
+        $modelName = $this->argument('name');
+        $viewPath = $this->getPath($modelName);
         if (! $this->files->isDirectory($viewPath)) {
             $this->files->makeDirectory($viewPath, 0777, true, true);
         }
 
         $templatePath = $this->getStub();
 
-        $replaces = $this->getReplace($name);
+        $replaces = $this->getReplaces($modelName);
 
         $views = ['index', 'table', 'create', 'edit', 'show', 'form'];
         foreach ($views as $view) {
@@ -90,10 +92,10 @@ class ViewMakeCommand extends GeneratorCommand
     /**
      * Get the destination class path.
      *
-     * @param string $name
+     * @param string $modelName
      * @return string
      */
-    protected function getPath($name)
+    protected function getPath($modelName)
     {
         if ($this->option('path')) {
             $basePath = trim($this->option('path'));
@@ -101,7 +103,7 @@ class ViewMakeCommand extends GeneratorCommand
             $basePath = config('generator.path_view');
         }
 
-        return trim($basePath, '/') . '/' . str_plural(snake_case($name));
+        return trim($basePath, '/') . '/' . str_plural(snake_case($modelName));
     }
 
     /**
@@ -121,20 +123,26 @@ class ViewMakeCommand extends GeneratorCommand
         return $viewFolder;
     }
 
-    protected function getReplace($name)
+    /**
+     * Get the replaces.
+     *
+     * @param <type> $modelName The model name
+     * @return array
+     */
+    protected function getReplaces($modelName)
     {
         $replaces = [
             'DummyMainLayout' => config('generator.main_layout'),
-            'DummyResourceUrl' => str_plural(snake_case($name)),
-            'DummyModelPluralVariable' => str_plural(lcfirst($name)),
-            'DummyModelVariable' => camel_case($name),
-            'DummyViewPath' => $this->getViewPath($name),
+            'DummyResourceName' => $this->getResourceName($modelName, $this->option('package')),
+            'DummyModelPluralVariable' => str_plural(lcfirst($modelName)),
+            'DummyModelVariable' => camel_case($modelName),
+            'DummyViewPath' => $this->getViewPath($modelName),
             'DummyTableHead' => '',
             'DummyTableBody' => '',
             'DummyFormInputs' => ''
         ];
 
-        $tableName = str_plural(snake_case($name));
+        $tableName = str_plural(snake_case($modelName));
         $fields = $this->schemaParser->getFillableFields($tableName);
 
         if ($fields->isEmpty()) {

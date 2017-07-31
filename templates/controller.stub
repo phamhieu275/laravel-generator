@@ -38,7 +38,7 @@ class DummyClass extends Controller
     public function store(Request $request)
     {
         DummyModelClass::create($request->all());
-        return redirect()->route('DummyResourceUrl.index');
+        return redirect()->route('DummyResourceName.index');
     }
 
     /**
@@ -75,7 +75,7 @@ class DummyClass extends Controller
         $DummyModelVariable->fill($request->all());
         $DummyModelVariable->save();
 
-        return redirect()->route('DummyResourceUrl.index');
+        return redirect()->route('DummyResourceName.index');
     }
 
     /**
@@ -88,6 +88,6 @@ class DummyClass extends Controller
     {
         $DummyModelVariable->delete();
 
-        return redirect()->route('DummyResourceUrl.index');
+        return redirect()->route('DummyResourceName.index');
     }
 }

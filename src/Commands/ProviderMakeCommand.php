@@ -103,7 +103,12 @@ class ProviderMakeCommand extends BaseProviderMakeCommand
     protected function buildClass($name)
     {
         if ($this->option('model') && $this->option('view')) {
-            return str_replace('DummyViewNamespace', $this->option('view'), parent::buildClass($name));
+            $replaces = [
+                'DummyControllerNamespace' => $this->rootNamespace() . '\\Http\\Controllers',
+                'DummyViewNamespace' => trim($this->option('view')),
+            ];
+
+            return str_replace(array_keys($replaces), array_values($replaces), parent::buildClass($name));
         }
 
         return parent::buildClass($name);
