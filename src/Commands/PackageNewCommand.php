@@ -59,13 +59,12 @@ class PackageNewCommand extends Command
         $packageName = $this->getPackage();
 
         $relativePath = $this->getRelativePath($vendorName, $packageName);
-        $packagePath = $this->getPackagePath($relativePath);
 
         $rootNamespace = $vendorName . '\\' . $packageName;
-        $this->generateSkeleton($rootNamespace, $packageName, $relativePath, $packagePath);
+        $this->generateSkeleton($rootNamespace, $packageName, $relativePath);
 
         if ($this->option('model')) {
-            $this->generateResource($this->option('model'), $rootNamespace, $relativePath, $packagePath);
+            $this->generateResource($rootNamespace, $packageName, $relativePath, $this->option('model'));
         }
 
         $this->info('Running composer dump-autoload. Please wait a minute.');
@@ -113,11 +112,11 @@ class PackageNewCommand extends Command
      * @param string $rootNamespace The root namespace
      * @param string $packageName The package name
      * @param string $relativePath The relative path
-     * @param string $packagePath The package path
      * @return void
      */
-    private function generateSkeleton($rootNamespace, $packageName, $relativePath, $packagePath)
+    private function generateSkeleton($rootNamespace, $packageName, $relativePath)
     {
+        $packagePath = $this->getPackagePath($relativePath);
         $this->createPackageFolder($packagePath);
 
         $this->createComposerFile($packagePath, $packageName);
@@ -162,84 +161,79 @@ class PackageNewCommand extends Command
     /**
      * Generate CRUD with given model name
      *
-     * @param string $model The model
      * @param string $rootNamespace The root namespace
+     * @param string $packageName The package name
      * @param string $relativePath The relative path
-     * @param string $packagePath The package path
+     * @param string $modelClass The model class
      * @return void
      */
-    private function generateResource($model, $rootNamespace, $relativePath, $packagePath)
+    private function generateResource($rootNamespace, $packageName, $relativePath, $modelClass)
     {
-        $this->createRouteFile($packagePath, $model, $rootNamespace);
+        $packagePath = $this->getPackagePath($relativePath);
+        $modelName = class_basename($modelClass);
 
-        if (! class_exists($model)) {
+        $this->generateRoute($packagePath, $packageName, $modelName);
+
+        if (! class_exists($modelClass)) {
             $this->call('generator:make:model', [
-                'name' => $model,
+                'name' => $modelName,
                 '--namespace' => $rootNamespace,
                 '--path' => $relativePath . '/src/Models'
             ]);
         }
 
+        $viewNamespace = $this->getViewNamespace($rootNamespace) . '::';
+
         $this->call('generator:make:controller', [
-            'name' => studly_case(class_basename($model)) . 'Controller',
+            'name' => $this->getControllerName($modelName),
             '--namespace' => $rootNamespace,
             '--path' => $relativePath . '/src/Http/Controllers',
-            '--model' => $model,
+            '--model' => $modelClass,
             '--skipCheckModel' => true,
-            '--view' => $this->getViewNamespace($rootNamespace) . '::'
+            '--view' =>  $viewNamespace,
+            '--package' => $packageName
         ]);
 
         $this->call('generator:make:view', [
-            'name' => class_basename($model),
+            'name' => $modelName,
             '--path' => $relativePath . '/src/resources/views',
-            '--view' => $this->getViewNamespace($rootNamespace) . '::'
+            '--view' => $viewNamespace,
+            '--package' => $packageName
         ]);
     }
 
     /**
-     * Creates a route file.
+     * Define routes for controller actions.
      *
      * @param string $packagePath The package path
-     * @param string $model The model
-     * @param string $rootNamespace The root namespace
+     * @param string $packageName The package name
+     * @param string $model The model name
      * @return void
      */
-    private function createRouteFile($packagePath, $model, $rootNamespace)
+    private function generateRoute($packagePath, $packageName, $modelName)
     {
         $filePath = $packagePath . '/src/routes.php';
-        if ($this->files->exists($filePath)) {
-            return;
-        }
 
         $stubPath = $this->getTemplatePath() . '/package/routes.stub';
         $stub = $this->files->get($stubPath);
 
-        $modelClass = class_basename($model);
         $replaces = [
-            'DummyNamespaceController' => $rootNamespace . '\\Http\\Controllers',
-            'DummyResourceUrl' => str_plural(snake_case($modelClass)),
-            'DummyController' => studly_case($modelClass) . 'Controller',
+            'DummyResourceName' => $this->getResourceName($modelName),
+            'DummyController' => $this->getControllerName($modelName),
+            'DummyPackageName' => snake_case($packageName)
         ];
         $stub = str_replace(array_keys($replaces), array_values($replaces), $stub);
 
-        $this->files->put($filePath, $stub);
+        if ($this->files->exists($filePath)) {
+            $stub = str_replace('<?php', '', $stub);
 
-        $this->info('routes.php created successfully.');
-    }
+            $this->files->append($filePath, $stub);
 
-    /**
-     * Get the view namespace.
-     *
-     * @param string $rootNamespace The root namespace
-     * @return string
-     */
-    private function getViewNamespace($rootNamespace)
-    {
-        return collect(explode('\\', $rootNamespace))
-            ->map(function ($name) {
-                return snake_case($name);
-            })
-            ->flatten()
-            ->implode('.');
+            $this->info('routes.php updated successfully');
+        } else {
+            $this->files->put($filePath, $stub);
+
+            $this->info('routes.php created successfully.');
+        }
     }
 }

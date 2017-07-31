@@ -15,9 +15,9 @@
             <td>{{ $index + $offset + 1 }}</td>
             DummyTableBody
             <td>
-                {!! link_to_route('DummyResourceUrl.edit', 'Edit', [$DummyModelVariable->id], ['class' => 'btn btn-primary pull-left']) !!}
+                {!! link_to_route('DummyResourceName.edit', 'Edit', [$DummyModelVariable->id], ['class' => 'btn btn-primary pull-left']) !!}
                 {!! Form::open([
-                    'route' => ['DummyResourceUrl.destroy', $DummyModelVariable->id],
+                    'route' => ['DummyResourceName.destroy', $DummyModelVariable->id],
                     'method' => 'DELETE',
                     'onSubmit' => "return confirm('Are you sure wants to delete this record ?')",
                 ]) !!}
