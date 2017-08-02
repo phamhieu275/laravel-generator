@@ -139,7 +139,8 @@ class ViewMakeCommand extends GeneratorCommand
             'DummyViewPath' => $this->getViewPath($modelName),
             'DummyTableHead' => '',
             'DummyTableBody' => '',
-            'DummyFormInputs' => ''
+            'DummyFormInputs' => '',
+            'DummyShowFields' => ''
         ];
 
         $tableName = str_plural(snake_case($modelName));
@@ -155,11 +156,13 @@ class ViewMakeCommand extends GeneratorCommand
             $bodyColumns[] = '<td>{!! $' . $replaces['DummyModelVariable'] . '->' . $field . ' !!}</td>';
         }
 
-        $glue = '\n' . str_repeat(' ', 16);
+        $glue = "\n" . str_repeat(' ', 16);
         $replaces['DummyTableHead'] = implode($glue, $headerColumns);
         $replaces['DummyTableBody'] = implode($glue, $bodyColumns);
 
         $replaces['DummyFormInputs'] = $this->buildFormInputs($fields);
+
+        $replaces['DummyShowFields'] = $this->buildShowFields($fields, camel_case($modelName));
 
         return $replaces;
     }
@@ -208,6 +211,37 @@ class ViewMakeCommand extends GeneratorCommand
             $inputs[] = str_replace($placeholders, $replaces, $fieldTemplate);
         }
 
-        return implode('\n\n', $inputs);
+        return implode("\n\n", $inputs);
+    }
+
+    /**
+     * Build show fields.
+     *
+     * @param \Illuminate\Support\Collection $fields The fields
+     * @param string $modelVariable The model variable
+     * @return string
+     */
+    private function buildShowFields($fields, $modelVariable)
+    {
+        $fieldTemplate = $this->files->get($this->getStub() . 'show_field.blade.stub');
+
+        $placeholders = [
+            'DummyFieldName',
+            'DummyFieldLabel',
+            'DummyModelVariable',
+        ];
+
+        $showFields = [];
+        foreach ($fields as $field) {
+            $replaces = [
+                $field->getName(),
+                ucfirst($field->getName()),
+                $modelVariable
+            ];
+
+            $showFields[] = str_replace($placeholders, $replaces, $fieldTemplate);
+        }
+
+        return implode("\n\n", $showFields);
     }
 }
