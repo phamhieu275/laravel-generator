@@ -92,7 +92,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
     protected function getPath($name)
     {
         if ($this->option('path')) {
-            return $this->laravel['path'] . '/'. trim($this->option('path'), '/') . '/' . class_basename($name) . '.php';
+            return trim($this->option('path'), '/') . '/' . class_basename($name) . '.php';
         }
 
         return parent::getPath($name);
