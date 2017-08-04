@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Migrations\BaseCommand;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Filesystem\Filesystem;
 use Bluecode\Generator\Parser\SchemaParser;
-use Bluecode\Generator\Syntax\AddToTable;
+use Bluecode\Generator\Syntax\TableSyntax;
 
 class MigrationMakeCommand extends BaseCommand
 {
@@ -37,7 +37,7 @@ class MigrationMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $placeholder = '$table->increments(\'id\')';
+    protected $placeholder = '/(?<=function \(Blueprint \$table\) \{\n)[^\}]*\n/';
 
     /**
      * Create a new migration install command instance.
@@ -48,14 +48,14 @@ class MigrationMakeCommand extends BaseCommand
      * @param \Bluecode\Generator\Syntax\AddToTable $addToTable The add to table
      * @return void
      */
-    public function __construct(MigrationCreator $creator, Filesystem $files, SchemaParser $schemaParser, AddToTable $addToTable)
+    public function __construct(MigrationCreator $creator, Filesystem $files, SchemaParser $schemaParser, TableSyntax $tableSyntax)
     {
         parent::__construct();
 
         $this->creator = $creator;
         $this->files = $files;
         $this->schemaParser = $schemaParser;
-        $this->addToTable = $addToTable;
+        $this->tableSyntax = $tableSyntax;
     }
 
     /**
@@ -92,14 +92,14 @@ class MigrationMakeCommand extends BaseCommand
 
         // if the table is existed, update the schema into the migration file
         if (! empty($fields)) {
-            $schema = $this->addToTable->run($fields, $table);
+            $defineTable = $this->tableSyntax->getDefineTable($fields);
 
-            $content = str_replace($this->placeholder, $schema, $this->files->get($filePath));
+            $content = preg_replace($this->placeholder, $defineTable, $this->files->get($filePath));
             $this->files->put($filePath, $content);
         }
 
         $file = pathinfo($filePath, PATHINFO_FILENAME);
-        $this->line("<info>Created Migration:</info> {$file}");
+        $this->info("Created Migration: {$file}");
     }
 
     /**
