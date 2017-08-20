@@ -4,19 +4,19 @@
 <div class="container">
     <div class="row">
         <h1 class="pull-left"></h1>
-        <div>{!! link_to_route('DummyResourceName.create', 'Create', [], ['class' => 'btn btn-primary']) !!}</div>
+        <div>{!! link_to_route('DummyRoutePrefix.create', 'Create', [], ['class' => 'btn btn-primary']) !!}</div>
     </div>
 
     <div class="row">
-    @if ($DummyModelPluralVariable->isEmpty())
+    @if ($DummyPaginator->isEmpty())
         <div class="well text-center">No record found.</div>
     @else
-        @include('DummyViewPath.table')
+        @include('DummyViewNamespace.table')
     @endif
     </div>
 
     <div class="row">
-        {!! $DummyModelPluralVariable->render() !!}
+        {!! $DummyPaginator->render() !!}
     </div>
 </div>
 @endsection

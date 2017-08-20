@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Bluecode\Generator\Traits\TemplateTrait;
 use Bluecode\Generator\Parser\SchemaParser;
 
-class ViewMakeCommand extends GeneratorCommand
+class ViewGeneratorCommand extends GeneratorCommand
 {
     use TemplateTrait;
 
@@ -17,7 +17,7 @@ class ViewMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'generator:make:view';
+    protected $name = 'gen:view';
 
     /**
      * Create a new instance.
@@ -100,7 +100,7 @@ class ViewMakeCommand extends GeneratorCommand
         if ($this->option('path')) {
             $basePath = trim($this->option('path'));
         } else {
-            $basePath = config('generator.path_view');
+            $basePath = config('generator.path.view');
         }
 
         return trim($basePath, '/') . '/' . str_plural(snake_case($modelName));
@@ -112,7 +112,7 @@ class ViewMakeCommand extends GeneratorCommand
      * @param string $modelInput The model class
      * @return string
      */
-    protected function getViewPath($modelClass)
+    protected function getViewNamespace($modelClass)
     {
         $viewFolder = str_plural(snake_case(class_basename($modelClass)));
 
@@ -132,11 +132,11 @@ class ViewMakeCommand extends GeneratorCommand
     protected function getReplaces($modelName)
     {
         $replaces = [
-            'DummyMainLayout' => config('generator.main_layout'),
-            'DummyResourceName' => $this->getResourceName($modelName, $this->option('package')),
-            'DummyModelPluralVariable' => str_plural(lcfirst($modelName)),
+            'DummyMainLayout' => config('generator.view.layout'),
+            'DummyRoutePrefix' => $this->getRoutePrefix($modelName, $this->option('package')),
+            'DummyPaginator' => str_plural(lcfirst($modelName)),
             'DummyModelVariable' => camel_case($modelName),
-            'DummyViewPath' => $this->getViewPath($modelName),
+            'DummyViewNamespace' => $this->getViewNamespace($modelName),
             'DummyTableHead' => '',
             'DummyTableBody' => '',
             'DummyFormInputs' => '',

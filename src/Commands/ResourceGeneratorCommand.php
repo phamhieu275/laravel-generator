@@ -4,14 +4,14 @@ namespace Bluecode\Generator\Commands;
 
 use Illuminate\Console\Command;
 
-class ResourceMakeCommand extends Command
+class ResourceGeneratorCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'generator:make:resource {name : The model class name}';
+    protected $signature = 'gen:resource {name : The model class name}';
     /**
      * The console command description.
      *
@@ -28,13 +28,13 @@ class ResourceMakeCommand extends Command
     {
         $arguments = $this->arguments();
 
-        $this->call('generator:make:model', $arguments);
+        $this->call('gen:model', $arguments);
 
-        $this->call('generator:make:controller', [
+        $this->call('gen:controller', [
             'name' => $arguments['name'] . 'Controller',
-            '--model' => config('generator.namespace_model') . '\\' . $arguments['name']
+            '--model' => config('generator.namespace.model') . '\\' . $arguments['name']
         ]);
 
-        $this->call('generator:make:view', $arguments);
+        $this->call('gen:view', $arguments);
     }
 }

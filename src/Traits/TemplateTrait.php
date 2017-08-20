@@ -11,7 +11,7 @@ trait TemplateTrait
      */
     public function getTemplatePath()
     {
-        $templatePath = config('generator.path_public_template');
+        $templatePath = config('generator.path.template');
         if (! is_dir($templatePath)) {
             $templatePath = __DIR__ . '/../../templates/';
         }
@@ -20,19 +20,21 @@ trait TemplateTrait
     }
 
     /**
-     * Get the view namespace.
+     * Get view folder path
      *
-     * @param string $rootNamespace The root namespace
+     * @param string $modelName The model name
+     * @param string $packageName The package name
      * @return string
      */
-    public function getViewNamespace($rootNamespace)
+    public function getViewNamespace($modelName, $packageName = '')
     {
-        return collect(explode('\\', $rootNamespace))
-            ->map(function ($name) {
-                return snake_case($name);
-            })
-            ->flatten()
-            ->implode('.');
+        $viewFolder = str_plural(snake_case($modelName));
+
+        if (! empty($packageName)) {
+            return snake_case($packageName) . "::" . $viewFolder;
+        }
+
+        return $viewFolder;
     }
 
     /**
@@ -53,9 +55,10 @@ trait TemplateTrait
      * @param string $prefix The prefix
      * @return string
      */
-    public function getResourceName($modelName, $prefix = '')
+    public function getRoutePrefix($modelName, $prefix = '')
     {
         $resourceUrl = str_plural(snake_case($modelName));
+
         if (! empty($prefix)) {
             return snake_case($prefix) . '.' . $resourceUrl;
         }

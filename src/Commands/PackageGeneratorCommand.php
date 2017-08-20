@@ -9,7 +9,7 @@ use Bluecode\Generator\Traits\TemplateTrait;
 use Bluecode\Generator\Traits\ManipulatesPackageTrait;
 use Bluecode\Generator\Traits\InteractsWithUserTrait;
 
-class PackageNewCommand extends Command
+class PackageGeneratorCommand extends Command
 {
     use TemplateTrait;
     use ManipulatesPackageTrait;
@@ -20,7 +20,7 @@ class PackageNewCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'generator:package:new
+    protected $signature = 'generator:package
         {vendor : The vendor part of the namespace}
         {package : The name of package for the namespace}
         {--i|interactive : Interactive mode}
@@ -103,7 +103,7 @@ class PackageNewCommand extends Command
      */
     protected function getPackagePath($relativePath)
     {
-        return config('generator.package_base_path') . '/' . $relativePath;
+        return config('generator.package.base_path') . '/' . $relativePath;
     }
 
     /**
@@ -133,7 +133,7 @@ class PackageNewCommand extends Command
                 '--view' => $this->getViewNamespace($rootNamespace)
             ]);
         }
-        $this->call('generator:make:provider', $providerArguments);
+        $this->call('gen:provider', $providerArguments);
     }
 
     /**
@@ -175,7 +175,7 @@ class PackageNewCommand extends Command
         $this->generateRoute($packagePath, $packageName, $modelName);
 
         if (! class_exists($modelClass)) {
-            $this->call('generator:make:model', [
+            $this->call('gen:model', [
                 'name' => $modelName,
                 '--namespace' => $rootNamespace,
                 '--path' => $relativePath . '/src/Models'
@@ -184,7 +184,7 @@ class PackageNewCommand extends Command
 
         $viewNamespace = $this->getViewNamespace($rootNamespace) . '::';
 
-        $this->call('generator:make:controller', [
+        $this->call('gen:controller', [
             'name' => $this->getControllerName($modelName),
             '--namespace' => $rootNamespace,
             '--path' => $relativePath . '/src/Http/Controllers',
@@ -194,7 +194,7 @@ class PackageNewCommand extends Command
             '--package' => $packageName
         ]);
 
-        $this->call('generator:make:view', [
+        $this->call('gen:view', [
             'name' => $modelName,
             '--path' => $relativePath . '/src/resources/views',
             '--view' => $viewNamespace,
@@ -218,7 +218,7 @@ class PackageNewCommand extends Command
         $stub = $this->files->get($stubPath);
 
         $replaces = [
-            'DummyResourceName' => $this->getResourceName($modelName),
+            'DummyRoutePrefix' => $this->getRoutePrefix($modelName),
             'DummyController' => $this->getControllerName($modelName),
             'DummyPackageName' => snake_case($packageName)
         ];

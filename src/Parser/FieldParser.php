@@ -1,4 +1,6 @@
-<?php namespace Bluecode\Generator\Parser;
+<?php
+
+namespace Bluecode\Generator\Parser;
 
 class FieldParser
 {
@@ -17,68 +19,24 @@ class FieldParser
     ];
 
     /**
-     * @var string
-     */
-    protected $database;
-
-    /**
      * Create array of all the fields for a table
      *
      * @param string                                      $table Table Name
      * @param \Doctrine\DBAL\Schema\AbstractSchemaManager $schema
-     * @param string                                      $database
      *
      * @return array|bool
      */
-    public function generate($table, $schema, $database)
+    public function generate($table, $schema)
     {
-        $this->database = $database;
         $columns = $schema->listTableColumns($table);
         if (empty($columns)) {
             return false;
         }
 
         $indexParser = new IndexParser($table, $schema);
-        $fields = $this->setEnum($this->getFields($columns, $indexParser), $table);
+        $fields = $this->getFields($columns, $indexParser);
         $indexes = $this->getMultiFieldIndexes($indexParser);
         return array_merge($fields, $indexes);
-    }
-
-    /**
-     * Return all enum columns for a given table
-     * @param string $table
-     * @return array
-     */
-    protected function getEnum($table)
-    {
-        try {
-            $result = \DB::table('information_schema.columns')
-                ->where('table_schema', $this->database)
-                ->where('table_name', $table)
-                ->where('data_type', 'enum')
-                ->get(['column_name','column_type']);
-            if ($result) {
-                return $result;
-            } else {
-                return [];
-            }
-        } catch (\Exception $e) {
-            return [];
-        }
-    }
-
-    /**
-     * @param array $fields
-     * @param string $table
-     * @return array
-     */
-    protected function setEnum(array $fields, $table)
-    {
-        foreach ($this->getEnum($table) as $column) {
-            $fields[$column->column_name]['type'] = 'enum';
-            $fields[$column->column_name]['args'] = str_replace('enum(', 'array(', $column->column_type);
-        }
-        return $fields;
     }
 
     /**
@@ -88,7 +46,7 @@ class FieldParser
      */
     protected function getFields($columns, IndexParser $indexParser)
     {
-        $fields = array();
+        $fields = [];
         foreach ($columns as $column) {
             $name = $column->getName();
             $type = $column->getType()->getName();
@@ -268,7 +226,7 @@ class FieldParser
      */
     protected function getMultiFieldIndexes(IndexParser $indexParser)
     {
-        $indexes = array();
+        $indexes = [];
         foreach ($indexParser->getMultiFieldIndexes() as $index) {
             $indexArray = [
                 'field' => $index->columns,

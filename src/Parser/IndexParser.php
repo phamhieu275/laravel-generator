@@ -1,4 +1,6 @@
-<?php namespace Bluecode\Generator\Parser;
+<?php
+
+namespace Bluecode\Generator\Parser;
 
 class IndexParser
 {
@@ -22,8 +24,8 @@ class IndexParser
      */
     public function __construct($table, $schema)
     {
-        $this->indexes = array();
-        $this->multiFieldIndexes = array();
+        $this->indexes = [];
+        $this->multiFieldIndexes = [];
 
         $indexes = $schema->listTableIndexes($table);
 
@@ -107,8 +109,8 @@ class IndexParser
      */
     public function getIndex($name)
     {
-        if (isset($this->indexes[ $name ])) {
-            return (object) $this->indexes[ $name ];
+        if (isset($this->indexes[$name])) {
+            return (object) $this->indexes[$name];
         }
         return null;
     }

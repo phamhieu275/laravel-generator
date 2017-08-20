@@ -1,13 +1,15 @@
 {
     "name": "bluecode/laravel-generator",
-    "description": "Laravel CRUD Generator/Model/Migrate from just one command with including Controller, Service, Repository, Model, Migrations, routes.php update.",
+    "description": "Laravel Generator",
     "keywords": [
         "laravel",
         "model",
         "migration",
         "scaffold",
         "CRUD",
-        "generator"
+        "generator",
+        "MVC",
+        "bake"
     ],
     "license": "MIT",
     "authors": [
@@ -25,6 +27,13 @@
     "autoload": {
         "psr-4": {
             "Bluecode\\Generator\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bluecode\\Generator\\GeneratorServiceProvider"
+            ]
         }
     },
     "suggest": {

@@ -1,8 +1,9 @@
-<?php namespace Bluecode\Generator\Commands;
+<?php
+
+namespace Bluecode\Generator\Commands;
 
 use File;
 use Illuminate\Console\Command;
-use Bluecode\Generator\Generators\RepositoryGenerator;
 
 class PublishTemplateCommand extends Command
 {
@@ -11,7 +12,7 @@ class PublishTemplateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'generator:publish:template';
+    protected $signature = 'gen:template';
 
     /**
      * The console command description.
@@ -29,7 +30,7 @@ class PublishTemplateCommand extends Command
     {
         $templatesPath = __DIR__.'/../../templates';
 
-        $templatesCopyPath = config('generator.path_public_template');
+        $templatesCopyPath = config('generator.path.template');
 
         $this->copyDirectory($templatesPath, $templatesCopyPath, 'templates');
 

@@ -2,12 +2,12 @@
 
 namespace Bluecode\Generator\Commands;
 
-use Illuminate\Foundation\Console\ModelMakeCommand as BaseModelMakeCommand;
+use Illuminate\Foundation\Console\ModelMakeCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Bluecode\Generator\Parser\SchemaParser;
 use Bluecode\Generator\Traits\TemplateTrait;
 
-class ModelMakeCommand extends BaseModelMakeCommand
+class ModelGeneratorCommand extends ModelMakeCommand
 {
     use TemplateTrait;
 
@@ -16,7 +16,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
      *
      * @var string
      */
-    protected $name = 'generator:make:model';
+    protected $name = 'gen:model';
 
     /**
      * Get the console command options.
@@ -66,7 +66,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
             return $this->option('namespace') . '\Models';
         }
 
-        return config('generator.namespace_model');
+        return config('generator.namespace.model');
     }
 
     /**

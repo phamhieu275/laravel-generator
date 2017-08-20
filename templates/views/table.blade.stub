@@ -6,18 +6,18 @@
     </thead>
     <tbody>
         @php
-        $offset = ($DummyModelPluralVariable->currentPage() - 1) * $DummyModelPluralVariable->perPage();
-        $total = $DummyModelPluralVariable->total();
+        $offset = ($DummyPaginator->currentPage() - 1) * $DummyPaginator->perPage();
+        $total = $DummyPaginator->total();
         @endphp
 
-        @foreach($DummyModelPluralVariable as $DummyModelVariable)
+        @foreach($DummyPaginator as $DummyModelVariable)
         <tr>
             <td>{{ $index + $offset + 1 }}</td>
             DummyTableBody
             <td>
-                {!! link_to_route('DummyResourceName.edit', 'Edit', [$DummyModelVariable->id], ['class' => 'btn btn-primary pull-left']) !!}
+                {!! link_to_route('DummyRoutePrefix.edit', 'Edit', [$DummyModelVariable->id], ['class' => 'btn btn-primary pull-left']) !!}
                 {!! Form::open([
-                    'route' => ['DummyResourceName.destroy', $DummyModelVariable->id],
+                    'route' => ['DummyRoutePrefix.destroy', $DummyModelVariable->id],
                     'method' => 'DELETE',
                     'onSubmit' => "return confirm('Are you sure wants to delete this record ?')",
                 ]) !!}

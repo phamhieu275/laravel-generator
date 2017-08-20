@@ -2,11 +2,11 @@
 
 namespace Bluecode\Generator\Commands;
 
-use Illuminate\Foundation\Console\ProviderMakeCommand as BaseProviderMakeCommand;
+use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Bluecode\Generator\Traits\TemplateTrait;
 
-class ProviderMakeCommand extends BaseProviderMakeCommand
+class ProviderGeneratorCommand extends ProviderMakeCommand
 {
     use TemplateTrait;
 
@@ -15,7 +15,7 @@ class ProviderMakeCommand extends BaseProviderMakeCommand
      *
      * @var string
      */
-    protected $name = 'generator:make:provider';
+    protected $name = 'gen:provider';
 
     /**
      * Get the console command options.

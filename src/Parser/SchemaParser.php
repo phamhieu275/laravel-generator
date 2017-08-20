@@ -17,16 +17,6 @@ class SchemaParser
     protected $fieldParser;
 
     /**
-     * @var ForeignKeyParser
-     */
-    protected $foreignKeyParser;
-
-    /**
-     * @var string
-     */
-    protected $database;
-
-    /**
      * A list guard columns
      *
      * @var array
@@ -41,22 +31,41 @@ class SchemaParser
     /**
      * Inital new instance
      *
-     * @param string $database
-     * @param bool   $ignoreIndexNames
-     * @param bool   $ignoreForeignKeyNames
-     * @return void
+     * @param FieldParser $fieldParser The field parser
+     * @return object
      */
-    public function __construct()
+    public function __construct(FieldParser $fieldParser)
     {
-        $connection = DB::getDoctrineConnection();
-        $connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-        $connection->getDatabasePlatform()->registerDoctrineTypeMapping('bit', 'boolean');
+        $this->fieldParser = $fieldParser;
+    }
 
-        $this->database = $connection->getDatabase();
+    /**
+     * init the connection before call the method
+     *
+     * @param string $method The method name
+     * @param array $arguments The arguments
+     * @return mixed
+     */
+    public function __call($method, $arguments)
+    {
+        if (method_exists($this, $method)) {
+            $this->initConnection();
+            return call_user_func_array([$this, $method], $arguments);
+        }
+    }
 
-        $this->schema = $connection->getSchemaManager();
-        $this->fieldParser = new FieldParser();
-        $this->foreignKeyParser = new ForeignKeyParser();
+    /**
+     * initial the connection to the database
+     */
+    protected function initConnection()
+    {
+        if (! $this->schema) {
+            $connection = DB::getDoctrineConnection();
+            $connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+            $connection->getDatabasePlatform()->registerDoctrineTypeMapping('bit', 'boolean');
+
+            $this->schema = $connection->getSchemaManager();
+        }
     }
 
     /**
@@ -64,7 +73,7 @@ class SchemaParser
      *
      * @return mixed
      */
-    public function getTables()
+    protected function getTables()
     {
         return $this->schema->listTableNames();
     }
@@ -75,20 +84,9 @@ class SchemaParser
      * @param string $table The table
      * @return string The fields.
      */
-    public function getFields($table)
+    protected function getFields($table)
     {
-        return $this->fieldParser->generate($table, $this->schema, $this->database);
-    }
-
-    /**
-     * Gets the foreign key constraints.
-     *
-     * @param string $table The table
-     * @return string The foreign key constraints.
-     */
-    public function getForeignKeyConstraints($table)
-    {
-        return $this->foreignKeyParser->generate($table, $this->schema);
+        return $this->fieldParser->generate($table, $this->schema);
     }
 
     /**
@@ -97,7 +95,7 @@ class SchemaParser
      * @param string $table The table
      * @return string The fillable fields.
      */
-    public function getFillableFields($table)
+    protected function getFillableFields($table)
     {
         $columns = $this->schema->listTableColumns($table);
         return collect($columns)
@@ -112,7 +110,7 @@ class SchemaParser
      * @param string $table The table
      * @return boolean True if has soft delete, False otherwise.
      */
-    public function hasSoftDelete($table)
+    protected function hasSoftDelete($table)
     {
         $schema = $this->schema->listTableColumns($table);
         return isset($schema['deleted_at']) && $schema['deleted_at']->getType()->getName() === 'datetime';
@@ -124,7 +122,7 @@ class SchemaParser
      * @param string $table The table
      * @return boolean True if exist, False otherwise.
      */
-    public function isExist($table)
+    protected function isExist($table)
     {
         return $this->schema->tablesExist([$table]);
     }
