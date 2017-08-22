@@ -10,7 +10,7 @@ return [
     |
     */
     'path' => [
-        'template' => base_path('resources/bake_templates'),
+        'templates' => resource_path('vendor/laravel-generator1/templates'),
 
         'migration' => base_path('database/migrations'),
 
@@ -36,7 +36,7 @@ return [
     |
     */
     'namespace' => [
-        'model'          => 'App\\Models\\',
+        'model'          => 'App\\Models',
 
         'controller'     => 'App\\Http\\Controllers',
     ],

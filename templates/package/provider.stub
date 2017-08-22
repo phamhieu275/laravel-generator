@@ -17,7 +17,7 @@ class DummyClass extends ServiceProvider
             ->namespace('DummyControllerNamespace')
             ->group(__DIR__ . '/routes.php');
 
-        $this->loadViewsFrom(__DIR__ . '/resources/views', 'DummyViewNamespace');
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'DummyPackage');
     }
 
     /**

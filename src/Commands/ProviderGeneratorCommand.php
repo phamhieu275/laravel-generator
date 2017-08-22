@@ -11,28 +11,16 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
     use TemplateTrait;
 
     /**
-     * The name of the console command.
+     * The signature of the console command.
      *
      * @var string
      */
-    protected $name = 'gen:provider';
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        $options = parent::getOptions();
-
-        return array_merge($options, [
-            ['namespace', '', InputOption::VALUE_OPTIONAL, 'The namespace of provider class'],
-            ['path', '', InputOption::VALUE_OPTIONAL, 'The location where the provider file should be created.'],
-            ['model', '', InputOption::VALUE_OPTIONAL, 'Indicates if the model is used to generate crud'],
-            ['view', '', InputOption::VALUE_OPTIONAL, 'The view namespace'],
-        ]);
-    }
+    protected $signature = 'gen:provider
+        {name : The name of the provider}
+        {--p|path= : The path to generate into}
+        {--rns|rootNamespace= : The root namespace of the provider}
+        {--pk|package= : The name of the package}
+    ';
 
     /**
      * Get the stub file for the generator.
@@ -43,8 +31,8 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
     {
         $templatePath = $this->getTemplatePath();
 
-        if ($this->option('model')) {
-            return $templatePath . '/provider.model.stub';
+        if ($this->option('package')) {
+            return $templatePath . '/package/provider.stub';
         }
 
         return $templatePath . '/provider.stub';
@@ -58,7 +46,7 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        if ($this->option('namespace')) {
+        if ($this->option('package')) {
             return $rootNamespace;
         }
 
@@ -72,8 +60,8 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
      */
     protected function rootNamespace()
     {
-        if ($this->option('namespace')) {
-            return $this->option('namespace');
+        if ($this->option('rootNamespace')) {
+            return $this->option('rootNamespace');
         }
 
         return parent::rootNamespace();
@@ -102,10 +90,10 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
      */
     protected function buildClass($name)
     {
-        if ($this->option('model') && $this->option('view')) {
+        if ($this->option('package')) {
             $replaces = [
                 'DummyControllerNamespace' => $this->rootNamespace() . '\\Http\\Controllers',
-                'DummyViewNamespace' => trim($this->option('view')),
+                'DummyPackage' => $this->option('package'),
             ];
 
             return str_replace(array_keys($replaces), array_values($replaces), parent::buildClass($name));

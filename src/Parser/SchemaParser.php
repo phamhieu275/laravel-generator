@@ -22,6 +22,7 @@ class SchemaParser
      * @var array
      */
     private $guardFields = [
+        'password',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -31,12 +32,12 @@ class SchemaParser
     /**
      * Inital new instance
      *
-     * @param FieldParser $fieldParser The field parser
+     * @param ColumnParser $columnParser The column parser
      * @return object
      */
-    public function __construct(FieldParser $fieldParser)
+    public function __construct(ColumnParser $columnParser)
     {
-        $this->fieldParser = $fieldParser;
+        $this->columnParser = $columnParser;
     }
 
     /**
@@ -60,11 +61,7 @@ class SchemaParser
     protected function initConnection()
     {
         if (! $this->schema) {
-            $connection = DB::getDoctrineConnection();
-            $connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-            $connection->getDatabasePlatform()->registerDoctrineTypeMapping('bit', 'boolean');
-
-            $this->schema = $connection->getSchemaManager();
+            $this->schema = DB::getDoctrineSchemaManager();
         }
     }
 
@@ -78,15 +75,20 @@ class SchemaParser
         return $this->schema->listTableNames();
     }
 
+    protected function tablesExist($table)
+    {
+        return $this->schema->tablesExist($table);
+    }
+
     /**
      * Gets the fields.
      *
      * @param string $table The table
      * @return string The fields.
      */
-    protected function getFields($table)
+    protected function getColumns($table)
     {
-        return $this->fieldParser->generate($table, $this->schema);
+        return $this->columnParser->parse($this->schema->listTableColumns($table));
     }
 
     /**
@@ -95,7 +97,7 @@ class SchemaParser
      * @param string $table The table
      * @return string The fillable fields.
      */
-    protected function getFillableFields($table)
+    protected function getFillableColumns($table)
     {
         $columns = $this->schema->listTableColumns($table);
         return collect($columns)
@@ -105,7 +107,7 @@ class SchemaParser
     }
 
     /**
-     * Determines if it has soft delete.
+     * Determine whether the table uses soft delete.
      *
      * @param string $table The table
      * @return boolean True if has soft delete, False otherwise.
@@ -117,7 +119,7 @@ class SchemaParser
     }
 
     /**
-     * Determines if exist.
+     * Determine whether the table is exist.
      *
      * @param string $table The table
      * @return boolean True if exist, False otherwise.

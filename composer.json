@@ -3,13 +3,12 @@
     "description": "Laravel Generator",
     "keywords": [
         "laravel",
+        "generator",
         "model",
         "migration",
         "scaffold",
         "CRUD",
-        "generator",
-        "MVC",
-        "bake"
+        "MVC"
     ],
     "license": "MIT",
     "authors": [
@@ -22,11 +21,11 @@
         "doctrine/dbal": "^2.5"
     },
     "require-dev": {
-        "laravelcollective/html":"^5.4.0",
+        "laravelcollective/html":"5.*"
     },
     "autoload": {
         "psr-4": {
-            "Bluecode\\Generator\\": "src"
+            "Bluecode\\Generator\\": "src/"
         }
     },
     "extra": {
@@ -35,8 +34,5 @@
                 "Bluecode\\Generator\\GeneratorServiceProvider"
             ]
         }
-    },
-    "suggest": {
-        "doctrine/dbal": "Required to use generator from existing table."
     }
 }

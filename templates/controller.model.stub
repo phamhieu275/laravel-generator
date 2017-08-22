@@ -15,7 +15,7 @@ class DummyClass extends Controller
      */
     public function index()
     {
-        $DummyPaginator = DummyModelClass::paginate(10);
+        $DummyPaginator = DummyModelClass::paginate();
         return view('DummyViewNamespace.index', compact('DummyPaginator'));
     }
 

@@ -2,39 +2,80 @@
 
 namespace Bluecode\Generator\Commands;
 
+use Illuminate\Support\Str;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Console\ModelMakeCommand;
-use Symfony\Component\Console\Input\InputOption;
 use Bluecode\Generator\Parser\SchemaParser;
 use Bluecode\Generator\Traits\TemplateTrait;
+use Bluecode\Generator\Traits\CommandTrait;
 
 class ModelGeneratorCommand extends ModelMakeCommand
 {
     use TemplateTrait;
+    use CommandTrait;
 
     /**
-     * The name of the console command.
+     * The signature of the console command.
      *
      * @var string
      */
-    protected $name = 'gen:model';
+    protected $signature = 'gen:model
+        {name : The name of the model}
+        {--a|all : Generate a migration, factory, and resource controller for the model}
+        {--c|controller : Create a new controller for the model}
+        {--fa|factory : Create a new factory for the model}
+        {--f|force : Force overwriting existing files}
+        {--m|migration : Create a new migration file for the model}
+        {--r|resource : Indicates if the generated controller should be a resource controller}
+        {--d|softDelete : Indicates if the model uses the soft delete trait}
+        {--t|table= : The table name for the model}
+        {--rns|rootNamespace= : The root namespace of model class}
+        {--p|path= : The location where the model file should be created}
+    ';
 
     /**
-     * Get the console command options.
+     * Create a new controller creator command instance.
      *
-     * @return array
+     * @param \Bluecode\Generator\Parser\SchemaParser $schemaParser The schema parser
+     * @return void
      */
-    protected function getOptions()
+    public function __construct(Filesystem $files, SchemaParser $schemaParser)
     {
-        $options = parent::getOptions();
+        parent::__construct($files);
 
-        return array_merge($options, [
-            ['softDelete', 'd', InputOption::VALUE_NONE, 'Indicates if the model uses the soft delete trait.'],
+        $this->schemaParser = $schemaParser;
+    }
 
-            ['table', 't', InputOption::VALUE_OPTIONAL, 'Indicates if the model is created from the existed table.'],
+    /**
+     * Create a migration file for the model.
+     *
+     * @return void
+     */
+    protected function createMigration()
+    {
+        $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
 
-            ['namespace', '', InputOption::VALUE_OPTIONAL, 'The root namespace of model class.'],
+        $this->call('gen:migration', [
+            'name' => "create_{$table}_table",
+            '--create' => $table,
+        ]);
+    }
 
-            ['path', '', InputOption::VALUE_OPTIONAL, 'The location where the model file should be created.'],
+    /**
+     * Create a controller for the model.
+     *
+     * @return void
+     */
+    protected function createController()
+    {
+        $controller = Str::studly(class_basename($this->argument('name')));
+
+        $modelName = $this->qualifyClass($this->getNameInput());
+
+        $this->call('gen:controller', [
+            'name' => "{$controller}Controller",
+            '--model' => $this->option('resource') ? $modelName : null,
+            '--force' => $this->option('force')
         ]);
     }
 
@@ -62,8 +103,8 @@ class ModelGeneratorCommand extends ModelMakeCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        if ($this->option('namespace')) {
-            return $this->option('namespace') . '\Models';
+        if ($this->option('rootNamespace')) {
+            return trim($this->option('rootNamespace'), '\\') . '\Models';
         }
 
         return config('generator.namespace.model');
@@ -76,26 +117,11 @@ class ModelGeneratorCommand extends ModelMakeCommand
      */
     protected function rootNamespace()
     {
-        if ($this->option('namespace')) {
-            return $this->option('namespace');
+        if ($this->option('rootNamespace')) {
+            return $this->option('rootNamespace');
         }
 
         return parent::rootNamespace();
-    }
-
-    /**
-     * Get the destination class path.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function getPath($name)
-    {
-        if ($this->option('path')) {
-            return trim($this->option('path'), '/') . '/' . class_basename($name) . '.php';
-        }
-
-        return parent::getPath($name);
     }
 
     /**
@@ -146,7 +172,7 @@ class ModelGeneratorCommand extends ModelMakeCommand
     }
 
     /**
-     * Gets the table name.
+     * Get the table name.
      *
      * @return string The table name.
      */
@@ -159,22 +185,21 @@ class ModelGeneratorCommand extends ModelMakeCommand
         $this->tableName = trim($this->option('table'));
 
         if (empty($this->tableName)) {
-            $this->tableName = str_plural(snake_case($this->argument('name')));
+            $this->tableName = str_plural(snake_case(class_basename($this->argument('name'))));
         }
 
         return $this->tableName;
     }
 
     /**
-     * Gets fillable fields from database schema
+     * Get fillable fields from database schema
      *
      * @param string $tableName The table name
      * @return string The fillable.
      */
     protected function getFillable($tableName)
     {
-        $schemaParser = new SchemaParser;
-        $fields = $schemaParser->getFillableFields($tableName);
+        $fields = $this->schemaParser->getFillableColumns($tableName);
 
         return $fields
             ->map(function ($field) {

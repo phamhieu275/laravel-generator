@@ -14,12 +14,18 @@ class GeneratorServiceProvider extends ServiceProvider
     public function boot()
     {
         $configPath = __DIR__ . '/../config/generator.php';
-
-        $this->publishes([
-            $configPath => config_path('generator.php'),
-        ], 'generator');
-
         $this->mergeConfigFrom($configPath, 'generator');
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                $configPath => config_path('generator.php'),
+            ], 'laravel-generator.config');
+
+            $templatePath = __DIR__ . '/../templates';
+            $this->publishes([
+                $templatePath => config('generator.path.templates'),
+            ], 'laravel-generator.template');
+        }
     }
 
     /**
@@ -29,18 +35,17 @@ class GeneratorServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->commands([
-            'Bluecode\Generator\Commands\ControllerGeneratorCommand',
-            'Bluecode\Generator\Commands\FactoryGeneratorCommand',
-            'Bluecode\Generator\Commands\MigrationGeneratorCommand',
-            'Bluecode\Generator\Commands\PublishTemplateCommand',
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Commands\MigrationGeneratorCommand::class,
+                Commands\ControllerGeneratorCommand::class,
+                Commands\ModelGeneratorCommand::class,
+                Commands\ViewGeneratorCommand::class,
 
-            'Bluecode\Generator\Commands\ModelGeneratorCommand',
-            'Bluecode\Generator\Commands\ViewGeneratorCommand',
-
-            'Bluecode\Generator\Commands\ProviderGeneratorCommand',
-            'Bluecode\Generator\Commands\ResourceGeneratorCommand',
-            'Bluecode\Generator\Commands\PackageGeneratorCommand',
-        ]);
+                Commands\ResourceGeneratorCommand::class,
+                Commands\PackageGeneratorCommand::class,
+                Commands\ProviderGeneratorCommand::class,
+            ]);
+        }
     }
 }

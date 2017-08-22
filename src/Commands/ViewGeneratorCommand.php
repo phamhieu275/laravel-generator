@@ -13,11 +13,31 @@ class ViewGeneratorCommand extends GeneratorCommand
     use TemplateTrait;
 
     /**
-     * The name of the console command.
+     * The signature of the console command.
      *
      * @var string
      */
-    protected $name = 'gen:view';
+    protected $signature = 'gen:view
+        {name : The name of the view}
+        {model : The name of the model}
+        {--p|path= : The location where the view file should be created}
+        {--pk|package= : The package name}
+        {--f|force : Force overwriting existing files}
+    ';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a new view file';
+
+    /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'View';
 
     /**
      * Create a new instance.
@@ -33,32 +53,13 @@ class ViewGeneratorCommand extends GeneratorCommand
     }
 
     /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        $options = parent::getOptions();
-
-        return array_merge($options, [
-            ['path', '', InputOption::VALUE_OPTIONAL, 'The location where the view file should be created.'],
-
-            ['view', '', InputOption::VALUE_OPTIONAL, 'The view namespace'],
-
-            ['package', '', InputOption::VALUE_OPTIONAL, 'The package name'],
-        ]);
-    }
-
-    /**
      * Get the stub file for the generator.
      *
      * @return string
      */
     protected function getStub()
     {
-        $templatePath = $this->getTemplatePath();
-        return $templatePath . '/views/';
+        return $this->getTemplatePath() . '/views/' . $this->argument('name') . '.blade.stub';
     }
 
     /**
@@ -66,27 +67,29 @@ class ViewGeneratorCommand extends GeneratorCommand
      *
      * @return bool|null
      */
-    public function fire()
+    public function handle()
     {
-        $modelName = $this->argument('name');
-        $viewPath = $this->getPath($modelName);
-        if (! $this->files->isDirectory($viewPath)) {
-            $this->files->makeDirectory($viewPath, 0777, true, true);
+        $name = $this->argument('name');
+
+        if (! $this->files->exists($this->getStub())) {
+            $this->info("The template of the {$name} view is not found.");
+            return false;
         }
 
-        $templatePath = $this->getStub();
+        $this->type = "View {$name}";
 
-        $replaces = $this->getReplaces($modelName);
+        parent::handle();
+    }
 
-        $views = ['index', 'table', 'create', 'edit', 'show', 'form'];
-        foreach ($views as $view) {
-            $stub = $this->files->get($templatePath . "{$view}.blade.stub");
-
-            $path = $viewPath . "/{$view}.blade.php";
-            $this->files->put($path, str_replace(array_keys($replaces), array_values($replaces), $stub));
-
-            $this->info("{$view}.blade.php is created successfully.");
-        }
+    /**
+     * Parse the class name and format according to the root namespace.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function qualifyClass($name)
+    {
+        return $name;
     }
 
     /**
@@ -95,7 +98,7 @@ class ViewGeneratorCommand extends GeneratorCommand
      * @param string $modelName
      * @return string
      */
-    protected function getPath($modelName)
+    protected function getPath($name)
     {
         if ($this->option('path')) {
             $basePath = trim($this->option('path'));
@@ -103,24 +106,7 @@ class ViewGeneratorCommand extends GeneratorCommand
             $basePath = config('generator.path.view');
         }
 
-        return trim($basePath, '/') . '/' . str_plural(snake_case($modelName));
-    }
-
-    /**
-     * get view folder path
-     *
-     * @param string $modelInput The model class
-     * @return string
-     */
-    protected function getViewNamespace($modelClass)
-    {
-        $viewFolder = str_plural(snake_case(class_basename($modelClass)));
-
-        if ($this->option('view')) {
-            return $this->option('view') . $viewFolder;
-        }
-
-        return $viewFolder;
+        return trim($basePath, '/') . '/' . "{$name}.blade.php";
     }
 
     /**
@@ -129,14 +115,17 @@ class ViewGeneratorCommand extends GeneratorCommand
      * @param <type> $modelName The model name
      * @return array
      */
-    protected function getReplaces($modelName)
+    protected function buildClass($name)
     {
+        $stub = $this->files->get($this->getStub());
+        $modelName = $this->argument('model');
+
         $replaces = [
             'DummyMainLayout' => config('generator.view.layout'),
             'DummyRoutePrefix' => $this->getRoutePrefix($modelName, $this->option('package')),
             'DummyPaginator' => str_plural(lcfirst($modelName)),
             'DummyModelVariable' => camel_case($modelName),
-            'DummyViewNamespace' => $this->getViewNamespace($modelName),
+            'DummyViewNamespace' => $this->getViewNamespace($modelName, $this->option('package')),
             'DummyTableHead' => '',
             'DummyTableBody' => '',
             'DummyFormInputs' => '',
@@ -144,27 +133,34 @@ class ViewGeneratorCommand extends GeneratorCommand
         ];
 
         $tableName = str_plural(snake_case($modelName));
-        $fields = $this->schemaParser->getFillableFields($tableName);
+        $fields = $this->schemaParser->getFillableColumns($tableName);
 
         if ($fields->isEmpty()) {
             return $replaces;
         }
 
-        $headerColumns = $bodyColumns = [];
-        foreach ($fields->keys()->all() as $field) {
-            $headerColumns[] = '<th>' . title_case(str_replace('_', ' ', $field)) . '</th>';
-            $bodyColumns[] = '<td>{!! $' . $replaces['DummyModelVariable'] . '->' . $field . ' !!}</td>';
+        if ($name === 'table') {
+            $headerColumns = $bodyColumns = [];
+            foreach ($fields->keys()->all() as $field) {
+                $headerColumns[] = '<th>' . title_case(str_replace('_', ' ', $field)) . '</th>';
+                $bodyColumns[] = '<td>{!! $' . $replaces['DummyModelVariable'] . '->' . $field . ' !!}</td>';
+            }
+
+            $glue = "\n" . str_repeat(' ', 16);
+            $replaces['DummyTableHead'] = implode($glue, $headerColumns);
+            $replaces['DummyTableBody'] = implode($glue, $bodyColumns);
         }
 
-        $glue = "\n" . str_repeat(' ', 16);
-        $replaces['DummyTableHead'] = implode($glue, $headerColumns);
-        $replaces['DummyTableBody'] = implode($glue, $bodyColumns);
+        if ($name === 'form') {
+            $replaces['DummyFormInputs'] = $this->buildFormInputs($fields);
+        }
 
-        $replaces['DummyFormInputs'] = $this->buildFormInputs($fields);
+        if ($name === 'show') {
+            $replaces['DummyShowFields'] = $this->buildShowFields($fields, camel_case($modelName));
+        }
 
-        $replaces['DummyShowFields'] = $this->buildShowFields($fields, camel_case($modelName));
 
-        return $replaces;
+        return str_replace(array_keys($replaces), array_values($replaces), $stub);
     }
 
     /**
@@ -175,7 +171,7 @@ class ViewGeneratorCommand extends GeneratorCommand
      */
     private function buildFormInputs($fields)
     {
-        $fieldTemplate = $this->files->get($this->getStub() . 'form_field.blade.stub');
+        $fieldTemplate = $this->files->get($this->getTemplatePath() . '/views/form_field.blade.stub');
 
         $inputs = [];
         $placeholders = [
@@ -223,7 +219,7 @@ class ViewGeneratorCommand extends GeneratorCommand
      */
     private function buildShowFields($fields, $modelVariable)
     {
-        $fieldTemplate = $this->files->get($this->getStub() . 'show_field.blade.stub');
+        $fieldTemplate = $this->files->get($this->getTemplatePath() . '/views/show_field.blade.stub');
 
         $placeholders = [
             'DummyFieldName',

@@ -1,6 +1,6 @@
 {
     "name": "DummyPackageName",
-    "description": "This package contains DummyPackageName functions",
+    "description": "",
     "authors": "",
     "minimum-stability": "dev",
     "require": {}

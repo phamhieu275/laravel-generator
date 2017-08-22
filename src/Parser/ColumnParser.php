@@ -2,7 +2,7 @@
 
 namespace Bluecode\Generator\Parser;
 
-class FieldParser
+class ColumnParser
 {
 
     /**
@@ -19,32 +19,12 @@ class FieldParser
     ];
 
     /**
-     * Create array of all the fields for a table
+     * Parse the information of the column
      *
-     * @param string                                      $table Table Name
-     * @param \Doctrine\DBAL\Schema\AbstractSchemaManager $schema
-     *
-     * @return array|bool
-     */
-    public function generate($table, $schema)
-    {
-        $columns = $schema->listTableColumns($table);
-        if (empty($columns)) {
-            return false;
-        }
-
-        $indexParser = new IndexParser($table, $schema);
-        $fields = $this->getFields($columns, $indexParser);
-        $indexes = $this->getMultiFieldIndexes($indexParser);
-        return array_merge($fields, $indexes);
-    }
-
-    /**
      * @param \Doctrine\DBAL\Schema\Column[] $columns
-     * @param IndexParser $indexParser
      * @return array
      */
-    protected function getFields($columns, IndexParser $indexParser)
+    public function parse($columns)
     {
         $fields = [];
         foreach ($columns as $column) {
@@ -53,7 +33,6 @@ class FieldParser
             $length = $column->getLength();
             $default = $column->getDefault();
             $nullable = (!$column->getNotNull());
-            $index = $indexParser->getIndex($name);
 
             $decorators = null;
             $args = null;
@@ -71,15 +50,12 @@ class FieldParser
                     } else {
                         $type = str_replace('Integer', 'Increments', $type);
                     }
-
-                    $index = null;
                 } else {
                     if ($column->getUnsigned()) {
                         $decorators[] = 'unsigned';
                     }
                     if ($column->getAutoincrement()) {
                         $args = 'true';
-                        $index = null;
                     }
                 }
             } elseif ($type == 'dateTime') {
@@ -114,9 +90,6 @@ class FieldParser
             if ($default !== null) {
                 $decorators[] = $this->getDefault($default, $type);
             }
-            if ($index) {
-                $decorators[] = $this->decorate($index->type, $index->name);
-            }
 
             $field = ['field' => $name, 'type' => $type];
             if ($decorators) {
@@ -146,7 +119,7 @@ class FieldParser
     }
 
     /**
-     * Ge the default value of a field
+     * Get the default value of a field
      *
      * @param string $default
      * @param string $type
@@ -216,27 +189,5 @@ class FieldParser
         } else {
             return $function;
         }
-    }
-
-    /**
-     * Get the information of index
-     *
-     * @param IndexParser $indexParser
-     * @return array
-     */
-    protected function getMultiFieldIndexes(IndexParser $indexParser)
-    {
-        $indexes = [];
-        foreach ($indexParser->getMultiFieldIndexes() as $index) {
-            $indexArray = [
-                'field' => $index->columns,
-                'type' => $index->type,
-            ];
-            if ($index->name) {
-                $indexArray['args'] = $this->argsToString($index->name);
-            }
-            $indexes[] = $indexArray;
-        }
-        return $indexes;
     }
 }

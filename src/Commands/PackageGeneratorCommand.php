@@ -20,12 +20,14 @@ class PackageGeneratorCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'generator:package
+    protected $signature = 'gen:package
         {vendor : The vendor part of the namespace}
         {package : The name of package for the namespace}
         {--i|interactive : Interactive mode}
-        {--path= : The location where the package should be created.}
-        {--model= : The model class name}';
+        {--p|path= : The location where the package should be created}
+        {--m|model= : The model class name}
+        {--f|force : Force overwriting existing files}
+    ';
 
     /**
      * The console command description.
@@ -123,14 +125,13 @@ class PackageGeneratorCommand extends Command
 
         $providerArguments = [
             'name' => studly_case($packageName) . 'PackageProvider',
-            '--namespace' => $rootNamespace,
+            '--rootNamespace' => $rootNamespace,
             '--path' => "{$relativePath}/src"
         ];
 
         if ($this->option('model')) {
             $providerArguments = array_merge($providerArguments, [
-                '--model' => $this->option('model'),
-                '--view' => $this->getViewNamespace($rootNamespace)
+                '--package' => studly_case($packageName)
             ]);
         }
         $this->call('gen:provider', $providerArguments);
@@ -150,7 +151,7 @@ class PackageGeneratorCommand extends Command
             return;
         }
 
-        $stubPath = $this->getTemplatePath() . '/package/composer.json.stub';
+        $stubPath = $this->getTemplatePath() . '/package/composer.stub';
         $stub = str_replace('DummyPackageName', $packageName, $this->files->get($stubPath));
 
         $this->files->put($filePath, $stub);
@@ -177,7 +178,7 @@ class PackageGeneratorCommand extends Command
         if (! class_exists($modelClass)) {
             $this->call('gen:model', [
                 'name' => $modelName,
-                '--namespace' => $rootNamespace,
+                '--rootNamespace' => $rootNamespace,
                 '--path' => $relativePath . '/src/Models'
             ]);
         }
@@ -186,20 +187,29 @@ class PackageGeneratorCommand extends Command
 
         $this->call('gen:controller', [
             'name' => $this->getControllerName($modelName),
-            '--namespace' => $rootNamespace,
+            '--rootNamespace' => $rootNamespace,
             '--path' => $relativePath . '/src/Http/Controllers',
             '--model' => $modelClass,
-            '--skipCheckModel' => true,
-            '--view' =>  $viewNamespace,
             '--package' => $packageName
         ]);
 
-        $this->call('gen:view', [
-            'name' => $modelName,
-            '--path' => $relativePath . '/src/resources/views',
-            '--view' => $viewNamespace,
-            '--package' => $packageName
-        ]);
+        $viewFolderName = $this->getViewNamespace($modelName);
+        $actionViews = [
+            'index' => ['index', 'table'],
+            'create' => ['create', 'form'],
+            'edit' => ['edit', 'form'],
+            'show' => ['show']
+        ];
+        foreach ($actionViews as $views) {
+            foreach ($views as $view) {
+                $this->call('gen:view', [
+                    'name' => $view,
+                    'model' => $modelName,
+                    '--path' =>  "{$relativePath}/src/resources/views/{$viewFolderName}",
+                    '--package' => $packageName
+                ]);
+            }
+        }
     }
 
     /**
@@ -225,7 +235,7 @@ class PackageGeneratorCommand extends Command
         $stub = str_replace(array_keys($replaces), array_values($replaces), $stub);
 
         if ($this->files->exists($filePath)) {
-            $stub = str_replace('<?php', '', $stub);
+            $stub = str_replace("<?php\n", '', $stub);
 
             $this->files->append($filePath, $stub);
 

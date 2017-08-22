@@ -17,14 +17,15 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
      * @var string
      */
     protected $signature = 'gen:controller
-        {name : The name of the controller (with the Controller suffix).}
-        {--f|force : Force overwriting existing files without prompting.}
-        {--m|model= : Generate a resource controller for the given model.}
-        {--r|resource= : Generate a resource controller class.}
-        {--p|parent= : Generate a nested resource controller class.}
-        {--pk|package= : The package name to generator into.}
-        {--namespace= : The root namespace of controller class.}
-        {--prefix= : The namespace/routing prefix to use.}
+        {name : The name of the controller (with the Controller suffix)}
+        {--f|force : Force overwriting existing files}
+        {--m|model= : Generate a resource controller for the given model}
+        {--r|resource= : Generate a resource controller class}
+        {--p|parent= : Generate a nested resource controller class}
+        {--pk|package= : The package name to generator into}
+        {--path= : The relative path the controller is generated}
+        {--rns|rootNamespace= : The root namespace of controller class}
+        {--pr|prefix= : The namespace/routing prefix to use}
     ';
 
     /**
@@ -55,8 +56,8 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        if ($this->option('namespace')) {
-            return trim($this->option('namespace'), '\\') . '\Http\Controllers';
+        if ($this->option('rootNamespace')) {
+            return trim($this->option('rootNamespace'), '\\') . '\Http\Controllers';
         }
 
         return config('generator.namespace.controller');
@@ -69,8 +70,8 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
      */
     protected function rootNamespace()
     {
-        if ($this->option('namespace')) {
-            return trim($this->option('namespace'), '\\') . '\\';
+        if ($this->option('rootNamespace')) {
+            return trim($this->option('rootNamespace'), '\\') . '\\';
         }
 
         return parent::rootNamespace();
@@ -111,8 +112,8 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
 
         $model = trim(str_replace('/', '\\', $model), '\\');
 
-        if ($this->option('namespace')) {
-            $rootNamespace = $this->option('namespace');
+        if ($this->option('rootNamespace')) {
+            $rootNamespace = $this->option('rootNamespace');
         } else {
             $rootNamespace = config('generator.namespace.model');
         }

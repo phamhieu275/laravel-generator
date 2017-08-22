@@ -5,20 +5,21 @@ namespace Bluecode\Generator\Syntax;
 class TableSyntax
 {
     /**
-     * Return string for adding all foreign keys
+     * Get the define table to create the up migrate
      *
-     * @param array $items
+     * @param array $fields
      * @return array
      */
-    public function getDefineTable($fields)
+    public function getDefineTable($columns)
     {
         $padding = str_repeat(' ', 12);
-        $lines = '';
-        foreach ($fields as $fields) {
-            $lines .= $padding . $this->getDefineColumn($fields) . PHP_EOL;
+
+        $define = '';
+        foreach ($columns as $column) {
+            $define .= $padding . $this->getDefineColumn($column) . PHP_EOL;
         }
 
-        return $lines;
+        return $define;
     }
 
     /**
@@ -66,7 +67,7 @@ class TableSyntax
     }
 
     /**
-     * Adds decorators.
+     * Add decorators.
      *
      * @param string $decorators The decorators
      * @param $decorators
