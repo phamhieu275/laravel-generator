@@ -42,9 +42,9 @@ class GeneratorServiceProvider extends ServiceProvider
                 Commands\ModelGeneratorCommand::class,
                 Commands\ViewGeneratorCommand::class,
 
-                Commands\ResourceGeneratorCommand::class,
-                Commands\PackageGeneratorCommand::class,
+                Commands\MvcGeneratorCommand::class,
                 Commands\ProviderGeneratorCommand::class,
+                Commands\PackageGeneratorCommand::class,
             ]);
         }
     }

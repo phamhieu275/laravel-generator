@@ -1,4 +1,5 @@
 @extends('DummyMainLayout')
+@section('title', __('Edit'))
 
 @section('content')
 <div class="row">

@@ -1,15 +1,16 @@
 @extends('DummyMainLayout')
+@section('title', __('Index'))
 
 @section('content')
 <div class="container">
     <div class="row">
         <h1 class="pull-left"></h1>
-        <div>{!! link_to_route('DummyRoutePrefix.create', 'Create', [], ['class' => 'btn btn-primary']) !!}</div>
+        <div>{!! link_to_route('DummyRoutePrefix.create', __('Create'), [], ['class' => 'btn btn-primary']) !!}</div>
     </div>
 
     <div class="row">
     @if ($DummyPaginator->isEmpty())
-        <div class="well text-center">No record found.</div>
+        <div class="well text-center">{{ __('No record found.') }}</div>
     @else
         @include('DummyViewNamespace.table')
     @endif

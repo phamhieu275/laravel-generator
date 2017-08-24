@@ -6,19 +6,6 @@ class ColumnParser
 {
 
     /**
-     * Convert dbal types to Laravel Migration Types
-     * @var array
-     */
-    protected $fieldTypeMap = [
-        'tinyint'  => 'tinyInteger',
-        'smallint' => 'smallInteger',
-        'mediumint'=> 'mediumInteger',
-        'bigint'   => 'bigInteger',
-        'datetime' => 'dateTime',
-        'blob'     => 'binary',
-    ];
-
-    /**
      * Parse the information of the column
      *
      * @param \Doctrine\DBAL\Schema\Column[] $columns
@@ -27,167 +14,209 @@ class ColumnParser
     public function parse($columns)
     {
         $fields = [];
-        foreach ($columns as $column) {
-            $name = $column->getName();
+        foreach ($columns as $name => &$column) {
+            $field = [];
+
             $type = $column->getType()->getName();
-            $length = $column->getLength();
-            $default = $column->getDefault();
-            $nullable = (!$column->getNotNull());
-
-            $decorators = null;
-            $args = null;
-
-            if (isset($this->fieldTypeMap[$type])) {
-                $type = $this->fieldTypeMap[$type];
+            switch ($type) {
+                case 'tinyint':
+                case 'smallint':
+                case 'mediumint':
+                case 'integer':
+                case 'bigint':
+                    $field[] = $this->parseIntegerColumn($type, $column);
+                    break;
+                case 'datetime':
+                    $field[] = ['dateTime', $this->addQuote($name)];
+                    break;
+                case 'decimal':
+                    $field[] = $this->parseDecimalColumn($type, $column);
+                    break;
+                case 'float':
+                case 'double':
+                    $field[] = $this->parseFloatColumn($type, $column);
+                    break;
+                case 'string':
+                    $field[] = $this->parseStringColumn($type, $column);
+                    break;
+                case 'blob':
+                    $field[] = ['binary', $this->addQuote($name)];
+                    break;
+                default:
+                    $field[] = [$type, $this->addQuote($name)];
             }
 
-            // Different rules for different type groups
-            if (in_array($type, ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'])) {
-                // Integer
-                if ($column->getUnsigned() && $column->getAutoincrement()) {
-                    if ($type == 'integer') {
-                        $type = 'increments';
-                    } else {
-                        $type = str_replace('Integer', 'Increments', $type);
-                    }
-                } else {
-                    if ($column->getUnsigned()) {
-                        $decorators[] = 'unsigned';
-                    }
-                    if ($column->getAutoincrement()) {
-                        $args = 'true';
-                    }
-                }
-            } elseif ($type == 'dateTime') {
-                if ($name == 'deleted_at' && $nullable) {
-                    $nullable = false;
-                    $type = 'softDeletes';
-                    $name = '';
-                } elseif ($name == 'created_at' && isset($fields['updated_at'])) {
-                    $fields['updated_at'] = ['field' => '', 'type' => 'timestamps'];
-                    continue;
-                } elseif ($name == 'updated_at' and isset($fields['created_at'])) {
-                    $fields['created_at'] = ['field' => '', 'type' => 'timestamps'];
-                    continue;
-                }
-            } elseif (in_array($type, ['decimal', 'float', 'double'])) {
-                // Precision based numbers
-                $args = $this->getPrecision($column->getPrecision(), $column->getScale());
-                if ($column->getUnsigned()) {
-                    $decorators[] = 'unsigned';
-                }
-            } else {
-                // Probably not a number (string/char)
-                if ($type === 'string' && $column->getFixed()) {
-                    $type = 'char';
-                }
-                $args = $this->getLength($length);
+            if ($this->isNullableColumn($column)) {
+                $field[] = ['nullable'];
             }
 
-            if ($nullable) {
-                $decorators[] = 'nullable';
-            }
-            if ($default !== null) {
-                $decorators[] = $this->getDefault($default, $type);
+            $field = array_merge($field, $this->getDefaultValue($column));
+
+            if (! is_null($column->getComment())) {
+                $field[] = ['comment', $this->addQuote($column->getComment())];
             }
 
-            $field = ['field' => $name, 'type' => $type];
-            if ($decorators) {
-                $field['decorators'] = $decorators;
-            }
-            if ($args) {
-                $field['args'] = $args;
-            }
             $fields[$name] = $field;
         }
+
+        if ($this->hasSpecifyTimestampColumn($columns, 'deleted_at')) {
+            unset($fields['deleted_at']);
+            $fields['softDeletes'] = [['softDeletes']];
+        }
+
+        if ($this->hasSpecifyTimestampColumn($columns, 'created_at')
+            && $this->hasSpecifyTimestampColumn($columns, 'updated_at')
+        ) {
+            unset($fields['created_at']);
+            unset($fields['updated_at']);
+            $fields['timestamps'] = [['timestamps']];
+        }
+
         return $fields;
     }
 
     /**
-     * Get the length of a field
+     * Get the information of the integer column
      *
-     * @param int $length
-     * @return int|null
+     * @param string $type The type
+     * @param \Doctrine\DBAL\Schema\Column $column The column
+     * @return array
      */
-    protected function getLength($length)
+    private function parseIntegerColumn($type, $column)
     {
-        if ($length and $length !== 255) {
-            return $length;
+        if ($type !== 'integer') {
+            $type = str_replace('int', 'Integer', $type);
         }
 
-        return null;
+        $hasIncrement = $column->getAutoincrement() ? 'true' : 'false';
+        $hasUnsigned = $column->getUnsigned() ? 'true' : 'false';
+
+        return [
+            $type,
+            $this->addQuote($column->getName()),
+            $hasIncrement,
+            $hasUnsigned
+        ];
     }
 
     /**
-     * Get the default value of a field
+     * Get the information of the decimal column
      *
-     * @param string $default
-     * @param string $type
+     * @param string $type The type
+     * @param \Doctrine\DBAL\Schema\Column $column The column
+     * @return array
+     */
+    private function parseDecimalColumn($type, $column)
+    {
+        if ($column->getUnsigned()) {
+            $type = 'unsignedDecimal';
+        }
+
+        return [
+            $type,
+            $this->addQuote($column->getName()),
+            $column->getPrecision(),
+            $column->getScale()
+        ];
+    }
+
+    /**
+     * Get the information of the float column
+     *
+     * @param string $type The type
+     * @param \Doctrine\DBAL\Schema\Column $column The column
+     * @return array
+     */
+    private function parseFloatColumn($type, $column)
+    {
+        return [
+            $type,
+            $this->addQuote($column->getName()),
+            $column->getPrecision(),
+            $column->getScale()
+        ];
+    }
+
+    /**
+     * Get the information of the string column
+     *
+     * @param string $type The type
+     * @param \Doctrine\DBAL\Schema\Column $column The column
+     * @return array
+     */
+    private function parseStringColumn($type, $column)
+    {
+        if ($column->getFixed()) {
+            $type = 'char';
+        }
+
+        return [
+            $type,
+            $this->addQuote($column->getName()),
+            $column->getLength()
+        ];
+    }
+
+    /**
+     * Get the default value
+     *
+     * @param \Doctrine\DBAL\Schema\Column $column The column
+     * @return array
+     */
+    private function getDefaultValue($column)
+    {
+        if (is_null($column->getDefault())) {
+            return [];
+        }
+
+        $defaultValue = $column->getDefault();
+        $type = $column->getType()->getName();
+
+        if ($type === 'timestamp' && $defaultValue === 'CURRENT_TIMESTAMP') {
+            $defaultValue = "DB::raw('CURRENT_TIMESTAMP')";
+        } elseif (strpos($type, 'int') === false) {
+            $defaultValue = $this->addQuote($defaultValue);
+        }
+
+        return [['default', $defaultValue]];
+    }
+
+    /**
+     * Add a quote to the input string
+     *
+     * @param string $str
      * @return string
      */
-    protected function getDefault($default, &$type)
+    private function addQuote($str)
     {
-        if (in_array($default, ['CURRENT_TIMESTAMP'])) {
-            if ($type == 'dateTime') {
-                $type = 'timestamp';
-            }
-            $default = $this->decorate('DB::raw', $default);
-        } elseif (in_array($type, ['string', 'text']) or !is_numeric($default)) {
-            $default = $this->argsToString($default);
-        }
-        return $this->decorate('default', $default, '');
+        return sprintf("'%s'", $str);
     }
 
     /**
-     * Get the precision value
+     * Determines if nullable column
      *
-     * @param int $precision
-     * @param int $scale
-     * @return string|void
+     * @param \Doctrine\DBAL\Schema\Column $column The column
+     * @return boolean True if nullable column, False otherwise.
      */
-    protected function getPrecision($precision, $scale)
+    private function isNullableColumn($column)
     {
-        if ($precision != 8 or $scale != 2) {
-            $result = $precision;
-            if ($scale != 2) {
-                $result .= ', ' . $scale;
-            }
-            return $result;
-        }
+        return ! $column->getNotNull();
     }
 
     /**
-     * Convert arguments to string
+     * Determines if it has specify timestamp column
      *
-     * @param string|array $args
-     * @param string       $quotes
-     * @return string
+     * @param array $columns The columns
+     * @param string $columnName The column name
+     * @return boolean True if has specify timestamp column, False otherwise.
      */
-    protected function argsToString($args, $quotes = '\'')
+    private function hasSpecifyTimestampColumn($columns, $columnName)
     {
-        if (is_array($args)) {
-            $seperator = $quotes .', '. $quotes;
-            $args = implode($seperator, $args);
+        if (! isset($columns[$columnName])) {
+            return false;
         }
 
-        return $quotes . $args . $quotes;
-    }
-
-    /**
-     * Get Decorator
-     *
-     * @param string       $function
-     * @param string|array $args
-     * @param string       $quotes
-     * @return string
-     */
-    protected function decorate($function, $args, $quotes = '\'')
-    {
-        if (! is_null($args)) {
-            $args = $this->argsToString($args, $quotes);
-            return $function . '(' . $args . ')';
-        } else {
-            return $function;
-        }
+        $type = $columns[$columnName]->getType()->getName();
+        return $type === 'timestamp' && $this->isNullableColumn($columns[$columnName]);
     }
 }

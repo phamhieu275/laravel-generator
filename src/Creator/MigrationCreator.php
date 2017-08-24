@@ -14,7 +14,7 @@ class MigrationCreator extends BaseMigrationCreator
      *
      * @var string
      */
-    protected $placeholder = '/(?<=function \(Blueprint \$table\) \{\n)[^\}]*\n/';
+    protected $placeholder = '/(?<=function\s\(Blueprint\s\$table\)\s\{\n)[^\}]*\n/';
 
     /**
      * Create a new migration creator instance.
@@ -42,8 +42,8 @@ class MigrationCreator extends BaseMigrationCreator
         $stub = parent::populateStub($name, $stub, $table);
 
         // if the table is existed, update the schema into the migration file
-        if (strpos($name, 'create') !== false && $this->schemaParser->tablesExist($table)) {
-            $defineTable = $this->tableSyntax->getDefineTable($this->schemaParser->getColumns($table));
+        if ($this->schemaParser->tablesExist($table)) {
+            $defineTable = $this->tableSyntax->getDefineTable($this->schemaParser->getTableInformation($table));
 
             $stub = preg_replace($this->placeholder, $defineTable, $stub);
         }

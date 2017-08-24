@@ -26,8 +26,6 @@ class MigrationGeneratorCommand extends MigrateMakeCommand
      *
      * @param \Illuminate\Database\Migrations\MigrationCreator $creator
      * @param \Illuminate\Support\Composer $composer The composer
-     * @param \Illuminate\Filesystem\Filesystem $files The files
-     * @param \Bluecode\Generator\Syntax\TableSyntax $tableSyntax The table syntax
      * @return void
      */
     public function __construct(MigrationCreator $creator, Composer $composer)
@@ -45,7 +43,7 @@ class MigrationGeneratorCommand extends MigrateMakeCommand
      */
     protected function writeMigration($name, $table, $create)
     {
-        parent::writeMigration($name, $table, $create);
+        parent::writeMigration($name, $table, true);
 
         if ($this->option('no-dump')) {
             exit;

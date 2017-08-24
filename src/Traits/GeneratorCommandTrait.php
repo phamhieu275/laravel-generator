@@ -2,7 +2,7 @@
 
 namespace Bluecode\Generator\Traits;
 
-trait CommandTrait
+trait GeneratorCommandTrait
 {
     /**
      * Determine if the class already exists.

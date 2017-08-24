@@ -7,12 +7,12 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Bluecode\Generator\Parser\SchemaParser;
 use Bluecode\Generator\Traits\TemplateTrait;
-use Bluecode\Generator\Traits\CommandTrait;
+use Bluecode\Generator\Traits\GeneratorCommandTrait;
 
 class ModelGeneratorCommand extends ModelMakeCommand
 {
     use TemplateTrait;
-    use CommandTrait;
+    use GeneratorCommandTrait;
 
     /**
      * The signature of the console command.

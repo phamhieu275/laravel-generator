@@ -10,18 +10,31 @@
         $total = $DummyPaginator->total();
         @endphp
 
-        @foreach($DummyPaginator as $DummyModelVariable)
+        @foreach($DummyPaginator as $index => $DummyModelVariable)
         <tr>
             <td>{{ $index + $offset + 1 }}</td>
             DummyTableBody
             <td>
-                {!! link_to_route('DummyRoutePrefix.edit', 'Edit', [$DummyModelVariable->id], ['class' => 'btn btn-primary pull-left']) !!}
+                {!! link_to_route(
+                    'DummyRoutePrefix.show',
+                    __('Show'),
+                    [$DummyModelVariable->id],
+                    ['class' => 'btn btn-info pull-left']
+                ) !!}
+
+                {!! link_to_route(
+                    'DummyRoutePrefix.edit',
+                    __('Edit'),
+                    [$DummyModelVariable->id],
+                    ['class' => 'btn btn-primary pull-left']
+                ) !!}
+
                 {!! Form::open([
                     'route' => ['DummyRoutePrefix.destroy', $DummyModelVariable->id],
                     'method' => 'DELETE',
                     'onSubmit' => "return confirm('Are you sure wants to delete this record ?')",
                 ]) !!}
-                {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}
+                {!! Form::submit(__('Delete'), ['class' => 'btn btn-danger']) !!}
                 {!! Form::close() !!}
             </td>
         </tr>

@@ -3,6 +3,7 @@
 namespace Bluecode\Generator\Parser;
 
 use DB;
+use Doctrine\DBAL\Types\Type;
 
 class SchemaParser
 {
@@ -33,11 +34,13 @@ class SchemaParser
      * Inital new instance
      *
      * @param ColumnParser $columnParser The column parser
+     * @param IndexParser $indexParser The index parser
      * @return object
      */
-    public function __construct(ColumnParser $columnParser)
+    public function __construct(ColumnParser $columnParser, IndexParser $indexParser)
     {
         $this->columnParser = $columnParser;
+        $this->indexParser = $indexParser;
     }
 
     /**
@@ -61,6 +64,11 @@ class SchemaParser
     protected function initConnection()
     {
         if (! $this->schema) {
+            Type::addType('timestamp', 'Bluecode\Generator\Doctrine\Timestamp');
+
+            $platform = DB::getDoctrineConnection()->getDatabasePlatform();
+            $platform->registerDoctrineTypeMapping('Timestamp', 'timestamp');
+
             $this->schema = DB::getDoctrineSchemaManager();
         }
     }
@@ -86,9 +94,15 @@ class SchemaParser
      * @param string $table The table
      * @return string The fields.
      */
-    protected function getColumns($table)
+    protected function getTableInformation($table)
     {
-        return $this->columnParser->parse($this->schema->listTableColumns($table));
+        $columns = $this->schema->listTableColumns($table);
+        $indexes = $this->schema->listTableIndexes($table);
+
+        return array_merge(
+            $this->columnParser->parse($columns),
+            $this->indexParser->parse($columns, $indexes)
+        );
     }
 
     /**
@@ -114,8 +128,8 @@ class SchemaParser
      */
     protected function hasSoftDelete($table)
     {
-        $schema = $this->schema->listTableColumns($table);
-        return isset($schema['deleted_at']) && $schema['deleted_at']->getType()->getName() === 'datetime';
+        $columns = $this->schema->listTableColumns($table);
+        return isset($columns['deleted_at']) && $columns['deleted_at']->getType()->getName() === 'datetime';
     }
 
     /**

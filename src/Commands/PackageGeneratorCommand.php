@@ -5,15 +5,19 @@ namespace Bluecode\Generator\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
-use Bluecode\Generator\Traits\TemplateTrait;
 use Bluecode\Generator\Traits\ManipulatesPackageTrait;
 use Bluecode\Generator\Traits\InteractsWithUserTrait;
+use Bluecode\Generator\Traits\TemplateTrait;
+use Bluecode\Generator\Traits\GeneratorCommandTrait;
+use Bluecode\Generator\Traits\ActionViewTrait;
 
 class PackageGeneratorCommand extends Command
 {
-    use TemplateTrait;
     use ManipulatesPackageTrait;
     use InteractsWithUserTrait;
+    use TemplateTrait;
+    use GeneratorCommandTrait;
+    use ActionViewTrait;
 
     /**
      * The console command name.
@@ -24,9 +28,10 @@ class PackageGeneratorCommand extends Command
         {vendor : The vendor part of the namespace}
         {package : The name of package for the namespace}
         {--i|interactive : Interactive mode}
+        {--f|force : Force overwriting existing files}
         {--p|path= : The location where the package should be created}
         {--m|model= : The model class name}
-        {--f|force : Force overwriting existing files}
+        {--a|actions= : The comma-separated action list}
     ';
 
     /**
@@ -183,8 +188,6 @@ class PackageGeneratorCommand extends Command
             ]);
         }
 
-        $viewNamespace = $this->getViewNamespace($rootNamespace) . '::';
-
         $this->call('gen:controller', [
             'name' => $this->getControllerName($modelName),
             '--rootNamespace' => $rootNamespace,
@@ -194,21 +197,14 @@ class PackageGeneratorCommand extends Command
         ]);
 
         $viewFolderName = $this->getViewNamespace($modelName);
-        $actionViews = [
-            'index' => ['index', 'table'],
-            'create' => ['create', 'form'],
-            'edit' => ['edit', 'form'],
-            'show' => ['show']
-        ];
-        foreach ($actionViews as $views) {
-            foreach ($views as $view) {
-                $this->call('gen:view', [
-                    'name' => $view,
-                    'model' => $modelName,
-                    '--path' =>  "{$relativePath}/src/resources/views/{$viewFolderName}",
-                    '--package' => $packageName
-                ]);
-            }
+
+        foreach ($this->getListView($this->option('actions')) as $view) {
+            $this->call('gen:view', [
+                'name' => $view,
+                'model' => $modelName,
+                '--path' =>  "{$relativePath}/src/resources/views/{$viewFolderName}",
+                '--package' => $packageName
+            ]);
         }
     }
 
@@ -230,7 +226,7 @@ class PackageGeneratorCommand extends Command
         $replaces = [
             'DummyRoutePrefix' => $this->getRoutePrefix($modelName),
             'DummyController' => $this->getControllerName($modelName),
-            'DummyPackageName' => snake_case($packageName)
+            'DummyPackage' => studly_case(strtolower($packageName))
         ];
         $stub = str_replace(array_keys($replaces), array_values($replaces), $stub);
 

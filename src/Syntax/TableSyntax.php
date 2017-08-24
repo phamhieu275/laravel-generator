@@ -28,61 +28,16 @@ class TableSyntax
      * @param array $field
      * @return string
      */
-    protected function getDefineColumn($field)
+    protected function getDefineColumn($column)
     {
-        $property = $field['field'];
+        $define = '';
+        foreach ($column as $property) {
+            $func = array_shift($property);
+            $args = implode(', ', $property);
 
-        // If the field is an array,
-        // make it an array in the Migration
-        if (is_array($property)) {
-            $property = "['". implode("','", $property) ."']";
-        } else {
-            $property = $property ? "'$property'" : null;
+            $define .= sprintf('->%s(%s)', $func, $args);
         }
 
-        $func = $field['type'];
-
-        // If we have args, then it needs
-        // to be formatted a bit differently
-        if (isset($field['args'])) {
-            $output = sprintf(
-                "\$table->%s(%s, %s)",
-                $func,
-                $property,
-                $field['args']
-            );
-        } else {
-            $output = sprintf(
-                "\$table->%s(%s)",
-                $func,
-                $property
-            );
-        }
-
-
-        if (isset($field['decorators'])) {
-            $output .= $this->addDecorators($field['decorators']);
-        }
-        return $output . ';';
-    }
-
-    /**
-     * Add decorators.
-     *
-     * @param string $decorators The decorators
-     * @param $decorators
-     * @return string
-     */
-    protected function addDecorators($decorators)
-    {
-        $output = '';
-        foreach ($decorators as $decorator) {
-            $output .= sprintf("->%s", $decorator);
-            // Do we need to tack on the parens?
-            if (strpos($decorator, '(') === false) {
-                $output .= '()';
-            }
-        }
-        return $output;
+        return "\$table{$define};";
     }
 }

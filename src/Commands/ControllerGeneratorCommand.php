@@ -4,12 +4,12 @@ namespace Bluecode\Generator\Commands;
 
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Bluecode\Generator\Traits\TemplateTrait;
-use Bluecode\Generator\Traits\CommandTrait;
+use Bluecode\Generator\Traits\GeneratorCommandTrait;
 
 class ControllerGeneratorCommand extends ControllerMakeCommand
 {
     use TemplateTrait;
-    use CommandTrait;
+    use GeneratorCommandTrait;
 
     /**
      * The signature of the console command.
@@ -38,14 +38,16 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
         $templatePath = $this->getTemplatePath();
 
         if ($this->option('parent')) {
-            return $templatePath . '/controller.nested.stub';
+            $stubPath = $templatePath . '/controller.nested.stub';
         } elseif ($this->option('model')) {
-            return $templatePath . '/controller.model.stub';
+            $stubPath = $templatePath . '/controller.model.stub';
         } elseif ($this->option('resource')) {
-            return $templatePath . '/controller.stub';
+            $stubPath = $templatePath . '/controller.stub';
+        } else {
+            $stubPath = $templatePath . '/controller.plain.stub';
         }
 
-        return $templatePath . '/controller.plain.stub';
+        return $stubPath;
     }
 
     /**

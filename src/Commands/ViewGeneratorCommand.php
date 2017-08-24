@@ -6,11 +6,13 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Bluecode\Generator\Traits\TemplateTrait;
+use Bluecode\Generator\Traits\GeneratorCommandTrait;
 use Bluecode\Generator\Parser\SchemaParser;
 
 class ViewGeneratorCommand extends GeneratorCommand
 {
     use TemplateTrait;
+    use GeneratorCommandTrait;
 
     /**
      * The signature of the console command.
@@ -20,9 +22,9 @@ class ViewGeneratorCommand extends GeneratorCommand
     protected $signature = 'gen:view
         {name : The name of the view}
         {model : The name of the model}
+        {--f|force : Force overwriting existing files}
         {--p|path= : The location where the view file should be created}
         {--pk|package= : The package name}
-        {--f|force : Force overwriting existing files}
     ';
 
     /**
@@ -78,7 +80,11 @@ class ViewGeneratorCommand extends GeneratorCommand
 
         $this->type = "View {$name}";
 
-        parent::handle();
+        if (is_callable('parent::handle')) {
+            parent::handle();
+        } else {
+            parent::fire();
+        }
     }
 
     /**
@@ -101,12 +107,13 @@ class ViewGeneratorCommand extends GeneratorCommand
     protected function getPath($name)
     {
         if ($this->option('path')) {
-            $basePath = trim($this->option('path'));
+            $basePath = trim($this->option('path'), '/');
         } else {
-            $basePath = config('generator.path.view');
+            $viewFolderName = $this->getViewNamespace($this->argument('model'));
+            $basePath = config('generator.path.view') . '/' . $viewFolderName;
         }
 
-        return trim($basePath, '/') . '/' . "{$name}.blade.php";
+        return $basePath . '/' . "{$name}.blade.php";
     }
 
     /**

@@ -18,13 +18,7 @@ return [
 
         'controller' => app_path('Http/Controllers'),
 
-        'view' => base_path('resources/views'),
-
-        'request' => app_path('Http/Requests'),
-
-        'route' => app_path('routes.php'),
-
-        'factory' => database_path('factories'),
+        'view' => resource_path('views'),
     ],
 
     /*

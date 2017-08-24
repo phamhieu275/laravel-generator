@@ -47,7 +47,7 @@ trait TemplateTrait
      */
     public function getControllerName($modelName)
     {
-        return studly_case(str_singular($modelName)) . 'Controller';
+        return studly_case(str_singular(trim($modelName))) . 'Controller';
     }
 
     /**
