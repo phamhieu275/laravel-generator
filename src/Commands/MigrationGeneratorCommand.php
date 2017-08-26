@@ -18,7 +18,6 @@ class MigrationGeneratorCommand extends MigrateMakeCommand
         {--create= : The table to be created}
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
-        {--no-dump : Skip running the composer dump-auto command}
     ';
 
     /**
@@ -31,23 +30,6 @@ class MigrationGeneratorCommand extends MigrateMakeCommand
     public function __construct(MigrationCreator $creator, Composer $composer)
     {
         parent::__construct($creator, $composer);
-    }
-
-    /**
-     * Write the migration file to disk.
-     *
-     * @param  string  $name
-     * @param  string  $table
-     * @param  bool    $create
-     * @return string
-     */
-    protected function writeMigration($name, $table, $create)
-    {
-        parent::writeMigration($name, $table, true);
-
-        if ($this->option('no-dump')) {
-            exit;
-        }
     }
 
     /**

@@ -1,11 +1,11 @@
 <?php
 
-namespace DummyNamespace;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class DummyClass extends Model
+class Foo extends Model
 {
     use SoftDeletes;
 
@@ -14,12 +14,12 @@ class DummyClass extends Model
      *
      * @var string
      */
-    protected $table = "DummyTableName";
+    protected $table = "foos";
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [DummyFillable];
+    protected $fillable = [];
 }

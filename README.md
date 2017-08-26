@@ -2,6 +2,10 @@ Laravel Resource Generator (Laravel5.4)
 =======================
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d70b34f6a08144f18d8dedd6da92f1db)](https://www.codacy.com/app/matmaxanh/laravel-generator?utm_source=github.com&utm_medium=referral&utm_content=matmaxanh/laravel-generator&utm_campaign=badger)
+[![Latest Stable Version](https://poser.pugx.org/bluecode/laravel-generator/v/stable)](https://packagist.org/packages/bluecode/laravel-generator)
+[![Total Downloads](https://poser.pugx.org/bluecode/laravel-generator/downloads)](https://packagist.org/packages/bluecode/laravel-generator)
+[![Latest Unstable Version](https://poser.pugx.org/bluecode/laravel-generator/v/unstable)](https://packagist.org/packages/bluecode/laravel-generator)
+[![License](https://poser.pugx.org/bluecode/laravel-generator/license)](https://packagist.org/packages/bluecode/laravel-generator)
 
 This package extend make laravel command to use custom template.
 Further more, add some new command as generate mvc, create new package.

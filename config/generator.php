@@ -10,7 +10,7 @@ return [
     |
     */
     'path' => [
-        'templates' => resource_path('vendor/laravel-generator1/templates'),
+        'templates' => resource_path('vendor/laravel-generator/templates'),
 
         'migration' => base_path('database/migrations'),
 

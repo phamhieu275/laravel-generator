@@ -8,7 +8,6 @@ use Illuminate\Filesystem\Filesystem;
 use Bluecode\Generator\Traits\ManipulatesPackageTrait;
 use Bluecode\Generator\Traits\InteractsWithUserTrait;
 use Bluecode\Generator\Traits\TemplateTrait;
-use Bluecode\Generator\Traits\GeneratorCommandTrait;
 use Bluecode\Generator\Traits\ActionViewTrait;
 
 class PackageGeneratorCommand extends Command
@@ -16,7 +15,6 @@ class PackageGeneratorCommand extends Command
     use ManipulatesPackageTrait;
     use InteractsWithUserTrait;
     use TemplateTrait;
-    use GeneratorCommandTrait;
     use ActionViewTrait;
 
     /**

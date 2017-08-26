@@ -45,6 +45,10 @@ class GeneratorServiceProvider extends ServiceProvider
                 Commands\MvcGeneratorCommand::class,
                 Commands\ProviderGeneratorCommand::class,
                 Commands\PackageGeneratorCommand::class,
+
+                Commands\AllMigrationGeneratorCommand::class,
+                Commands\AllModelGeneratorCommand::class,
+                Commands\AllMvcGeneratorCommand::class,
             ]);
         }
     }

@@ -64,10 +64,15 @@ class SchemaParser
     protected function initConnection()
     {
         if (! $this->schema) {
-            Type::addType('timestamp', 'Bluecode\Generator\Doctrine\Timestamp');
+            if (! Type::hasType('timestamp')) {
+                Type::addType('timestamp', 'Bluecode\Generator\Doctrine\Timestamp');
+            }
 
             $platform = DB::getDoctrineConnection()->getDatabasePlatform();
-            $platform->registerDoctrineTypeMapping('Timestamp', 'timestamp');
+
+            if (! $this->hasDoctrineTypeMappingFor('timestamp')) {
+                $platform->registerDoctrineTypeMapping('Timestamp', 'timestamp');
+            }
 
             $this->schema = DB::getDoctrineSchemaManager();
         }
@@ -80,7 +85,11 @@ class SchemaParser
      */
     protected function getTables()
     {
-        return $this->schema->listTableNames();
+        $tables = $this->schema->listTableNames();
+        if (($key = array_search('migrations', $tables)) !== false) {
+            unset($tables[$key]);
+        }
+        return $tables;
     }
 
     protected function tablesExist($table)

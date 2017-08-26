@@ -18,12 +18,17 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "laravelcollective/html":"5.*",
-        "doctrine/dbal": "~2.6"
+        "doctrine/dbal": "~2.6",
+        "laravelcollective/html":"5.*"
     },
     "autoload": {
         "psr-4": {
             "Bluecode\\Generator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bluecode\\Generator\\Tests\\": "tests/"
         }
     },
     "extra": {

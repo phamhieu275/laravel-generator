@@ -28,9 +28,15 @@ trait GeneratorCommandTrait
     public function getPath($name)
     {
         if ($this->hasOption('path') && $this->option('path')) {
-            return trim($this->option('path'), '/') . '/' . class_basename($name) . '.php';
+            return $this->option('path') . DIRECTORY_SEPARATOR . class_basename($name) . '.php';
         }
 
-        return parent::getPath($name);
+        $path = config('generator.path.' . strtolower($this->type));
+
+        if ($path) {
+            return $path . DIRECTORY_SEPARATOR . class_basename($name) . '.php';
+        }
+
+        return parent::getPath();
     }
 }

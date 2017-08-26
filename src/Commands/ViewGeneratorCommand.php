@@ -214,7 +214,7 @@ class ViewGeneratorCommand extends GeneratorCommand
             $inputs[] = str_replace($placeholders, $replaces, $fieldTemplate);
         }
 
-        return implode("\n\n", $inputs);
+        return implode("\n", $inputs);
     }
 
     /**
@@ -245,6 +245,6 @@ class ViewGeneratorCommand extends GeneratorCommand
             $showFields[] = str_replace($placeholders, $replaces, $fieldTemplate);
         }
 
-        return implode("\n\n", $showFields);
+        return implode("\n", $showFields);
     }
 }

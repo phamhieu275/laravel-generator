@@ -2,7 +2,6 @@
 
 namespace Bluecode\Generator\Commands;
 
-use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Bluecode\Generator\Parser\SchemaParser;
@@ -21,16 +20,16 @@ class ModelGeneratorCommand extends ModelMakeCommand
      */
     protected $signature = 'gen:model
         {name : The name of the model}
-        {--a|all : Generate a migration, factory, and resource controller for the model}
-        {--c|controller : Create a new controller for the model}
-        {--fa|factory : Create a new factory for the model}
         {--f|force : Force overwriting existing files}
-        {--m|migration : Create a new migration file for the model}
-        {--r|resource : Indicates if the generated controller should be a resource controller}
+        {--p|path= : The location where the model file should be created}
         {--d|softDelete : Indicates if the model uses the soft delete trait}
         {--t|table= : The table name for the model}
+        {--fillable= : The comma-separated fillable field list}
         {--rns|rootNamespace= : The root namespace of model class}
-        {--p|path= : The location where the model file should be created}
+        {--m|migration : Create a new migration file for the model}
+        {--fa|factory : Create a new factory for the model}
+        {--c|controller : Create a new controller for the model}
+        {--r|resource : Indicates if the generated controller should be a resource controller}
     ';
 
     /**
@@ -53,7 +52,7 @@ class ModelGeneratorCommand extends ModelMakeCommand
      */
     protected function createMigration()
     {
-        $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
+        $table = str_plural(snake_case(class_basename($this->argument('name'))));
 
         $this->call('gen:migration', [
             'name' => "create_{$table}_table",
@@ -68,7 +67,7 @@ class ModelGeneratorCommand extends ModelMakeCommand
      */
     protected function createController()
     {
-        $controller = Str::studly(class_basename($this->argument('name')));
+        $controller = studly_case(class_basename($this->argument('name')));
 
         $modelName = $this->qualifyClass($this->getNameInput());
 
@@ -178,17 +177,11 @@ class ModelGeneratorCommand extends ModelMakeCommand
      */
     protected function getTableName()
     {
-        if (isset($this->tableName)) {
-            return $this->tableName;
+        if ($this->option('table')) {
+            return trim($this->option('table'));
         }
 
-        $this->tableName = trim($this->option('table'));
-
-        if (empty($this->tableName)) {
-            $this->tableName = str_plural(snake_case(class_basename($this->argument('name'))));
-        }
-
-        return $this->tableName;
+        return str_plural(snake_case(class_basename($this->argument('name'))));
     }
 
     /**
@@ -199,10 +192,18 @@ class ModelGeneratorCommand extends ModelMakeCommand
      */
     protected function getFillable($tableName)
     {
-        $fields = $this->schemaParser->getFillableColumns($tableName);
+        if ($this->option('fillable')) {
+            $fields = collect(explode(',', trim($this->option('fillable'))));
+        } else {
+            $fields = $this->schemaParser->getFillableColumns($tableName);
+        }
 
         return $fields
             ->map(function ($field) {
+                if (is_string($field)) {
+                    return "'{$field}'";
+                }
+
                 return "'{$field->getName()}'";
             })
             ->flatten()
