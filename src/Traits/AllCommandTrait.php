@@ -4,6 +4,11 @@ namespace Bluecode\Generator\Traits;
 
 trait AllCommandTrait
 {
+    /**
+     * Get the list model base on only and exclude arguments
+     *
+     * @return array
+     */
     public function getListModel()
     {
         if ($this->option('only')) {

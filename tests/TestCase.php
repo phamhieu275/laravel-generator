@@ -4,8 +4,8 @@ namespace Bluecode\Generator\Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Filesystem\Filesystem;
 use Config;
+use File;
 
 class TestCase extends BaseTestCase
 {
@@ -41,10 +41,8 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->filesystem = new Filesystem;
-
-        if (! $this->filesystem->isDirectory($this->outputPath)) {
-            $this->filesystem->makeDirectory($this->outputPath);
+        if (! File::exists($this->outputPath)) {
+            File::makeDirectory($this->outputPath);
         }
 
         $this->setTempConfig();
@@ -54,7 +52,7 @@ class TestCase extends BaseTestCase
     {
         parent::tearDown();
 
-        $this->filesystem->cleanDirectory($this->outputPath);
+        File::cleanDirectory($this->outputPath);
     }
 
     /**
