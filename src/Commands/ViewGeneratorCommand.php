@@ -107,7 +107,7 @@ class ViewGeneratorCommand extends GeneratorCommand
     protected function getPath($name)
     {
         if ($this->option('path')) {
-            $basePath = trim($this->option('path'), '/');
+            $basePath = trim($this->option('path'));
         } else {
             $viewFolderName = $this->getViewNamespace($this->argument('model'));
             $basePath = config('generator.path.view') . '/' . $viewFolderName;
@@ -174,9 +174,9 @@ class ViewGeneratorCommand extends GeneratorCommand
             $bodyColumns[] = '<td>{!! $' . $replaces['DummyModelVariable'] . '->' . $field . ' !!}</td>';
         }
 
-        $glue = "\n" . str_repeat(' ', 16);
-        $replaces['DummyTableHead'] = implode($glue, $headerColumns);
-        $replaces['DummyTableBody'] = implode($glue, $bodyColumns);
+        $glue = "\n" . str_repeat(' ', 12);
+        $replaces['DummyTableHead'] = $glue. implode($glue, $headerColumns);
+        $replaces['DummyTableBody'] = $glue . implode($glue, $bodyColumns);
 
         return $replaces;
     }

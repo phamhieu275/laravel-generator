@@ -2,7 +2,11 @@
 
 namespace Bluecode\Generator\Tests\Commands;
 
+use DB;
+use File;
 use Bluecode\Generator\Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ModelGeneratorCommandTest extends TestCase
 {
@@ -100,5 +104,24 @@ class ModelGeneratorCommandTest extends TestCase
             $this->expectedPath . '/models/Foo_custom_root_namespace.php',
             $this->outputPath . '/Foo.php'
         );
+    }
+
+    /**
+     * @group model
+     */
+    public function test_create_model_with_existed_table()
+    {
+        DB::unprepared(File::get(__DIR__ . '/../sql/create_bars_table.sql'));
+
+        $this->artisan('gen:model', [
+            'name' => 'Bar',
+        ]);
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Bar.php',
+            $this->outputPath . '/Bar.php'
+        );
+
+        DB::statement('DROP TABLE IF EXISTS `bars`');
     }
 }

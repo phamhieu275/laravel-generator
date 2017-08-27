@@ -1,36 +1,48 @@
 <table class="table table-striped table-bordered">
     <thead>
         <tr>
-            <th>No</th>DummyTableHead
+            <th>No</th>
+            <th>Name</th>
+            <th>Content</th>
+            <th>Publish Date</th>
+            <th>Author Id</th>
+            <th>Rate</th>
+            <th>Score</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         @php
-        $offset = ($DummyPaginator->currentPage() - 1) * $DummyPaginator->perPage();
-        $total = $DummyPaginator->total();
+        $offset = ($bars->currentPage() - 1) * $bars->perPage();
+        $total = $bars->total();
         @endphp
 
-        @foreach($DummyPaginator as $index => $DummyModelVariable)
+        @foreach($bars as $index => $bar)
         <tr>
-            <td>{{ $index + $offset + 1 }}</td>DummyTableBody
+            <td>{{ $index + $offset + 1 }}</td>
+            <td>{!! $bar->name !!}</td>
+            <td>{!! $bar->content !!}</td>
+            <td>{!! $bar->publish_date !!}</td>
+            <td>{!! $bar->author_id !!}</td>
+            <td>{!! $bar->rate !!}</td>
+            <td>{!! $bar->score !!}</td>
             <td>
                 {!! link_to_route(
-                    'DummyRoutePrefix.show',
+                    'bars.show',
                     __('Show'),
-                    [$DummyModelVariable->id],
+                    [$bar->id],
                     ['class' => 'btn btn-info pull-left']
                 ) !!}
 
                 {!! link_to_route(
-                    'DummyRoutePrefix.edit',
+                    'bars.edit',
                     __('Edit'),
-                    [$DummyModelVariable->id],
+                    [$bar->id],
                     ['class' => 'btn btn-primary pull-left']
                 ) !!}
 
                 {!! Form::open([
-                    'route' => ['DummyRoutePrefix.destroy', $DummyModelVariable->id],
+                    'route' => ['bars.destroy', $bar->id],
                     'method' => 'DELETE',
                     'onSubmit' => "return confirm('Are you sure wants to delete this record ?')",
                 ]) !!}

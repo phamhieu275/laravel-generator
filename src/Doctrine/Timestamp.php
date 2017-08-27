@@ -30,35 +30,4 @@ class Timestamp extends Type
     {
         return $platform->getIntegerTypeDeclarationSQL($fieldDeclaration);
     }
-
-    /**
-     * Converts the timestamp to a value for database insertion
-     *
-     * @param mixed $value
-     * @param AbstractPlatform $platform
-     *
-     * @return int
-     */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
-    {
-        if ($value instanceof \DateTime) {
-            return $value->getTimestamp();
-        }
-        return (int)$value;
-    }
-
-    /**
-     * Converts a value loaded from the database to a DateTime instance
-     *
-     * @param int $value
-     * @param AbstractPlatform $platform
-     *
-     * @return \DateTime
-     */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
-    {
-        $dt = new \DateTime();
-        $dt->setTimestamp($value);
-        return $dt;
-    }
 }

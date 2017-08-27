@@ -1,7 +1,9 @@
 <table class="table table-striped table-bordered">
     <thead>
-        <th>No</th>
-        <th></th>
+        <tr>
+            <th>No</th>
+            <th></th>
+        </tr>
     </thead>
     <tbody>
         @php

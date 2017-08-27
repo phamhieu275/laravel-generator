@@ -128,27 +128,4 @@ class SchemaParser
                 return ! $column->getAutoincrement() && ! in_array($column->getName(), $this->guardFields);
             });
     }
-
-    /**
-     * Determine whether the table uses soft delete.
-     *
-     * @param string $table The table
-     * @return boolean True if has soft delete, False otherwise.
-     */
-    protected function hasSoftDelete($table)
-    {
-        $columns = $this->schema->listTableColumns($table);
-        return isset($columns['deleted_at']) && $columns['deleted_at']->getType()->getName() === 'datetime';
-    }
-
-    /**
-     * Determine whether the table is exist.
-     *
-     * @param string $table The table
-     * @return boolean True if exist, False otherwise.
-     */
-    protected function isExist($table)
-    {
-        return $this->schema->tablesExist([$table]);
-    }
 }
