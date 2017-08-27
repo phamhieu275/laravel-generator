@@ -1,0 +1,7 @@
+@extends('DummyMainLayout')
+
+@section('content')
+<div class="container">
+DummyShowFields
+</div>
+@endsection

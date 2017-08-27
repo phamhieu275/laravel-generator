@@ -1,13 +1,14 @@
 {
     "name": "bluecode/laravel-generator",
-    "description": "Laravel CRUD Generator/Model/Migrate from just one command with including Controller, Service, Repository, Model, Migrations, routes.php update.",
+    "description": "Laravel Generator",
     "keywords": [
         "laravel",
+        "generator",
         "model",
         "migration",
         "scaffold",
         "CRUD",
-        "generator"
+        "MVC"
     ],
     "license": "MIT",
     "authors": [
@@ -17,19 +18,24 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "doctrine/dbal": "^2.5"
-    },
-    "require-dev": {
-        "laravelcollective/html":"^5.4.0",
-        "laracasts/flash": "^3.0"
+        "doctrine/dbal": "~2.6",
+        "laravelcollective/html":"5.*"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "Bluecode\\Generator\\": "src"
+            "Bluecode\\Generator\\": "src/"
         }
     },
-    "suggest": {
-        "doctrine/dbal": "Required to use generator from existing table."
+    "autoload-dev": {
+        "psr-4": {
+            "Bluecode\\Generator\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bluecode\\Generator\\GeneratorServiceProvider"
+            ]
+        }
     }
 }

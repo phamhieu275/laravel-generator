@@ -1,0 +1,7 @@
+{
+    "name": "DummyPackageName",
+    "description": "",
+    "authors": "",
+    "minimum-stability": "dev",
+    "require": {}
+}

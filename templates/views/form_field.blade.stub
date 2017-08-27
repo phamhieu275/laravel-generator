@@ -1,0 +1,5 @@
+<div class="form-group {!! $errors->has('DummyFieldName') ? 'has-error' : '' !!}">
+    {!! Form::label('DummyFieldName', __('DummyInputLabel'), ['class' => 'control-label']) !!}
+    {!! Form::DummyInputType('DummyFieldName', null, ['class' => 'form-control']) !!}
+    {!! $errors->first('DummyFieldName', '<small class="help-block">:message</small>') !!}
+</div>

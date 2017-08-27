@@ -1,10 +1,12 @@
-<?php namespace Bluecode\Generator\Parser;
+<?php
+
+namespace Bluecode\Generator\Parser;
 
 use DB;
+use Doctrine\DBAL\Types\Type;
 
 class SchemaParser
 {
-
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
@@ -16,91 +18,137 @@ class SchemaParser
     protected $fieldParser;
 
     /**
-     * @var ForeignKeyParser
-     */
-    protected $foreignKeyParser;
-
-    /**
-     * @var string
-     */
-    protected $database;
-
-    /**
      * A list guard columns
      *
      * @var array
      */
-    private $guardFields = ['created_at', 'updated_at', 'deleted_at', 'remember_token'];
+    private $guardFields = [
+        'password',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'remember_token'
+    ];
 
     /**
-     * @param string $database
-     * @param bool   $ignoreIndexNames
-     * @param bool   $ignoreForeignKeyNames
+     * Inital new instance
+     *
+     * @param ColumnParser $columnParser The column parser
+     * @param IndexParser $indexParser The index parser
+     * @return object
      */
-    public function __construct()
+    public function __construct(ColumnParser $columnParser, IndexParser $indexParser)
     {
-        $connection = DB::getDoctrineConnection();
-        $connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-        $connection->getDatabasePlatform()->registerDoctrineTypeMapping('bit', 'boolean');
-
-        $this->database = $connection->getDatabase();
-
-        $this->schema = $connection->getSchemaManager();
-        $this->fieldParser = new FieldParser();
-        $this->foreignKeyParser = new ForeignKeyParser();
+        $this->columnParser = $columnParser;
+        $this->indexParser = $indexParser;
     }
 
     /**
+     * init the connection before call the method
+     *
+     * @param string $method The method name
+     * @param array $arguments The arguments
      * @return mixed
      */
-    public function getTables()
+    public function __call($method, $arguments)
     {
-        return $this->schema->listTableNames();
-    }
-
-    public function getFields($table)
-    {
-        return $this->fieldParser->generate($table, $this->schema, $this->database);
-    }
-
-    public function getForeignKeyConstraints($table)
-    {
-        return $this->foreignKeyParser->generate($table, $this->schema);
-    }
-
-    public function getFillableFieldsFromSchema($schema)
-    {
-        $fillableFields = [];
-        foreach ($schema as $fieldName => $column) {
-            if (empty($column['field']) || in_array($column['field'], $this->guardFields)) {
-                continue;
-            }
-
-            if (in_array($column['type'], [
-                'unique',
-                'tinyIncrements',
-                'smallIncrements',
-                'mediumIncrements',
-                'increments',
-                'bigIncrements'
-            ])) {
-                continue;
-            }
-
-            if (in_array($column['type'], ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger']) &&
-                isset($column['args']) &&
-                $column['args'] === 'true') {
-                continue;
-            }
-            $fillableFields[$fieldName] = $column;
+        if (method_exists($this, $method)) {
+            $this->initConnection();
+            return call_user_func_array([$this, $method], $arguments);
         }
-
-        return $fillableFields;
     }
 
-    public function getFillableFields($table)
+    /**
+     * initial the connection to the database
+     */
+    protected function initConnection()
     {
-        $schema = $this->getFields($table);
-        return $this->getFillableFieldsFromSchema($schema);
+        if (! $this->schema) {
+            if (! Type::hasType('timestamp')) {
+                Type::addType('timestamp', 'Bluecode\Generator\Doctrine\Timestamp');
+            }
+
+            $platform = DB::getDoctrineConnection()->getDatabasePlatform();
+
+            if (! $this->hasDoctrineTypeMappingFor('timestamp')) {
+                $platform->registerDoctrineTypeMapping('Timestamp', 'timestamp');
+            }
+
+            $this->schema = DB::getDoctrineSchemaManager();
+        }
+    }
+
+    /**
+     * Gets the tables.
+     *
+     * @return mixed
+     */
+    protected function getTables()
+    {
+        $tables = $this->schema->listTableNames();
+        if (($key = array_search('migrations', $tables)) !== false) {
+            unset($tables[$key]);
+        }
+        return $tables;
+    }
+
+    protected function tablesExist($table)
+    {
+        return $this->schema->tablesExist($table);
+    }
+
+    /**
+     * Gets the fields.
+     *
+     * @param string $table The table
+     * @return string The fields.
+     */
+    protected function getTableInformation($table)
+    {
+        $columns = $this->schema->listTableColumns($table);
+        $indexes = $this->schema->listTableIndexes($table);
+
+        return array_merge(
+            $this->columnParser->parse($columns),
+            $this->indexParser->parse($columns, $indexes)
+        );
+    }
+
+    /**
+     * Gets the fillable fields.
+     *
+     * @param string $table The table
+     * @return string The fillable fields.
+     */
+    protected function getFillableColumns($table)
+    {
+        $columns = $this->schema->listTableColumns($table);
+        return collect($columns)
+            ->filter(function ($column) {
+                return ! $column->getAutoincrement() && ! in_array($column->getName(), $this->guardFields);
+            });
+    }
+
+    /**
+     * Determine whether the table uses soft delete.
+     *
+     * @param string $table The table
+     * @return boolean True if has soft delete, False otherwise.
+     */
+    protected function hasSoftDelete($table)
+    {
+        $columns = $this->schema->listTableColumns($table);
+        return isset($columns['deleted_at']) && $columns['deleted_at']->getType()->getName() === 'datetime';
+    }
+
+    /**
+     * Determine whether the table is exist.
+     *
+     * @param string $table The table
+     * @return boolean True if exist, False otherwise.
+     */
+    protected function isExist($table)
+    {
+        return $this->schema->tablesExist([$table]);
     }
 }

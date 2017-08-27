@@ -1,26 +1,14 @@
 Laravel Resource Generator (Laravel5.4)
-======================= 
+=======================
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d70b34f6a08144f18d8dedd6da92f1db)](https://www.codacy.com/app/matmaxanh/laravel-generator?utm_source=github.com&utm_medium=referral&utm_content=matmaxanh/laravel-generator&utm_campaign=badger)
+[![Latest Stable Version](https://poser.pugx.org/bluecode/laravel-generator/v/stable)](https://packagist.org/packages/bluecode/laravel-generator)
+[![Total Downloads](https://poser.pugx.org/bluecode/laravel-generator/downloads)](https://packagist.org/packages/bluecode/laravel-generator)
+[![Latest Unstable Version](https://poser.pugx.org/bluecode/laravel-generator/v/unstable)](https://packagist.org/packages/bluecode/laravel-generator)
+[![License](https://poser.pugx.org/bluecode/laravel-generator/license)](https://packagist.org/packages/bluecode/laravel-generator)
 
-The artisan command can generate the following items:
-  * Migration File
-  * Model
-  * Repository
-  * Service
-  * Controller
-  * View
-    * index.blade.php
-    * show.blade.php
-    * create.blade.php
-    * edit.blade.php
-    * form.blade.php
-  * adjusts routes.php
-  * adjusts ModelFactory.php
-
-Here is the full documentation.
-
-[Upgrade Guide](https://github.com/matmaxanh/laravel-generator/blob/master/Upgrade_Guide.md).
+This package extend make laravel command to use custom template.
+Further more, add some new command as generate mvc, create new package.
 
 # Documentation is in process...
 
@@ -28,172 +16,135 @@ Documentation
 --------------
 
 1. [Installation](#installation)
-2. [Configuration](#configuration)
-3. [Publish & Initialization](#publish--initialization)
-4. [Generator](#generator)
-5. [Supported Field Types](#supported-field-types)
-5. [Customize Templates](#customize-templates)
-6. [Options](#options)
-	1. [Paginate Records](#paginate-records)
-	2. [Auth triat](#model-auth)
+2. [Publish](#publish)
+3. [Generator Command](#generator--command)
+4. [Option](#option)
 
 ## Installation
 
 1. Add this package to your composer.json:
-  
-        "require": {
-            "doctrine/dbal": "^2.5",
-            "laracasts/flash": "dev-master",
-            "laravelcollective/html": "5.1.*@dev",
-            "bluecode/laravel-generator": "dev-master"
-        }
-  
+
+  ```bash
+  composer require bluecode/laravel-generator
+  ```
+
 2. Run composer update
 
-        composer update
-    
-3. Add the ServiceProviders to the providers array in ```config/app.php```.<br>
-   As we are using these two packages [laravelcollective/html](https://github.com/LaravelCollective/html) & [laracasts/flash](https://github.com/laracasts/flash) as a dependency.<br>
-   so we need to add those ServiceProviders as well.
+  ```bash
+  composer update
+  ```
 
-		Collective\Html\HtmlServiceProvider::class,
-		Laracasts\Flash\FlashServiceProvider::class,
-		Bluecode\Generator\GeneratorServiceProvider::class,
-        
-   Also for convenience, add these facades in alias array in ```config/app.php```.
+3. Add the ServiceProviders to the providers array in ```config/app.php```<br>
 
-		'Form'      => Collective\Html\FormFacade::class,
-		'Html'      => Collective\Html\HtmlFacade::class,
-		'Flash'     => Laracasts\Flash\Flash::class
+  ```php
+  Bluecode\Generator\GeneratorServiceProvider::class,
+  ```
 
-## Configuration
+  As we are using [laravelcollective/html](https://github.com/LaravelCollective/html)as a dependency<br>
+  so we need to add those ServiceProviders as well.
 
-Publish Configuration file ```generator.php```.
+  ```php
+  Collective\Html\HtmlServiceProvider::class,
+  ```
 
-        php artisan vendor:publish
-        
-Config file (```config/generator.php```) contains path for all generated files
+  Also for convenience, add these facades in alias array in ```config/app.php```
 
-```base_controller``` - Base Controller for all Controllers<br>
+  ```php
+  'Form'      => Collective\Html\FormFacade::class,
+  'Html'      => Collective\Html\HtmlFacade::class,
+  ```
 
-```path_migration``` - Path where Migration file to be generated<br>
-```path_model``` - Path where Model file to be generated<br>
-```path_repository``` - Path where Repository file to be generated<br>
-```path_service``` - Path where Service file to be generated<br>
-```path_controller``` - Path where Controller file to be generated<br>
-```path_views``` - Path where views will be created<br>
-```path_request``` -  Path where request file will be created<br>
-```path_routes``` - Path of routes.php (if you are using any custom routes file)<br>
+## Publish
 
-```namespace_model``` - Namespace of Model<br>
-```namespace_repository``` - Namespace of Repository<br>
-```namespace_service``` - Namespace of Service<br>
-```namespace_controller``` - Namespace of Controller<br>
-```namespace_request``` - Namespace for Request<br>
+1. Publish configuration file ```generator.php```
 
-```model_extend_class``` - Extend class of Models<br>
+  ```bash
+  php artisan vendor:publish --tag=laravel-generator.config
+  ```
 
-```main_layout``` - Extend master layout<br>
+2. Publish template folder into ```resources/vendor/laravel-generator/templates```
 
-```route_prefix``` - Prefix of scaffold route<br>
+  ```bash
+  php artisan vendor:publish --tag=laravel-generator.template
+  ```
 
-```use_repository_layer``` - Using repository layer<br>
+## Generator Command
 
-```use_service_layer``` - Using service layer<br>
+1. Generate Migration:
 
-## Publish & Initialization
+  ```bash
+  php artisan gen:migrate MigrationName
+  ```
 
-1. Publish some common views like ```paginate.blade.php```.
-        php artisan generator:publish
-
-2. Publish template.
-        php artisan generator:publish --templates
-
-3. Publish a base repository file
-        php artisan generator:publish --baseRepository
-
-## Generator
-
-Fire artisan command to generate Migration, Model, Scaffold with CRUD views from exist tables.
-This package can generate files from a specify table or from all tables in database.
-
-This package require you to pass at least one argument for table name.
-If you want to pass many table name, a list table name will separate by comma.
-
-Generate Migration From Exist Tables:
-  
-        php artisan generator:make:migrate TableName
-
-Generate CRUD Scaffold:
- 
-        php artisan generator:make:scaffold TableName
-
-Generate Model With Validation And Relationships:
-
-        php artisan generator:make:model TableName
-
-Generate Factory From Exist Tables:
-
-        php artisan generator:make:factory TableName
-
-Generate All Resource File:
-
-        php artisan generator:make:resource TableName
-        
-e.g.
-    php artisan generator:migrate
-    php artisan generator:migrate posts,comments
-
-    php artisan generator:make:model 
-    php artisan generator:make:model posts,comments
-    php artisan generator:make:model --tables=posts,comments
-    php artisan generator:make:model --ignore=posts,comments
-    php artisan generator:make:model posts,comments --models=Post,Comment
-
-    php artisan generator:make:scaffold
-    php artisan generator:make:scaffold posts,comments
-    php artisan generator:make:scaffold --tables=posts,comments
-    php artisan generator:make:scaffold --ignore=posts,comments
-
-    php artisan generator:make:factory posts,comments
-
-    php artisan generator:make:resource posts,comments
-
-## Supported HTML Field Types
-
-Here is the list of supported field types with options:
-  * text
-  * textarea
-  * password
-  * email
-  * checkbox
-  * number
-  * date
-
-## Customize Templates
-
-To use your own custom templates,
-
-1. Publish templates to  ```/resources/generator-templates```
-
-        php artisan generator:publish --templates
-
-2. Leave only those templates that you want to change. Remove the templates that do not plan to change.
-
-## Options
-
-### Paginate Records
-
-To paginate records, you can specify paginate option,
 e.g.
 
-        php artisan generator:make:scaffold posts --paginate=10
+  ```bash
+  php artisan gen:migrate create_posts_table
+  ```
 
-### Model use Auth
+2. Generate Model:
 
-To use Auth trait, use auth option,
+  php artisan gen:model ModelName
 
-        php artisan generator:make:model users --auth
+e.g.
+
+  ```bash
+  php artisan gen:model Post
+  ```
+
+3. Generate Controller
+
+  ```bash
+  php artisan gen:model ModelName
+  ```
+
+e.g.
+
+  ```bash
+  php artisan gen:model Post
+  ```
+
+4. Generate View
+
+  ```bash
+  php artisan gen:view ViewName
+  ```
+
+e.g.
+
+  ```bash
+  php artisan gen:view index
+  php artisan gen:view create
+  ```
+
+5. Generate MVC:
+
+  ```bash
+  php artisan gen:mvc ModelName
+  ```
+
+e.g.
+  ```bash
+  php artisan gen:mvc Post
+  php artisan gen:mvc Post --actions=index,create,edit
+  ```
+
+6. Generate Package
+
+```bash
+  php artisan gen:package VendorName PackageName
+  ```
+
+e.g.
+  ```bash
+  php artisan gen:package Module Post
+  php artisan gen:package Module Post --path=packages/post
+  php artisan gen:package Module Post --actions=index,create,edit
+  ```
+
+## Option
+
+Use --force or -f to overwrite exist file on all command.
 
 Credits
 --------
