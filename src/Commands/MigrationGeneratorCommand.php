@@ -2,9 +2,9 @@
 
 namespace Bluecode\Generator\Commands;
 
+use Illuminate\Support\Composer;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Bluecode\Generator\Creator\MigrationCreator;
-use Illuminate\Support\Composer;
 
 class MigrationGeneratorCommand extends MigrateMakeCommand
 {

@@ -22,10 +22,11 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
         {--m|model= : Generate a resource controller for the given model}
         {--r|resource= : Generate a resource controller class}
         {--p|parent= : Generate a nested resource controller class}
-        {--pk|package= : The package name to generator into}
+        {--pk|package= : The package name to generate into}
         {--path= : The relative path the controller is generated}
-        {--rns|rootNamespace= : The root namespace of controller class}
-        {--pr|prefix= : The namespace/routing prefix to use}
+        {--ns|namespace= : The namespace of the controller class}
+        {--rns|rootNamespace= : The root namespace of the controller class}
+        {--rp|routePrefix= : The prefix route}
     ';
 
     /**
@@ -58,8 +59,8 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        if ($this->option('rootNamespace')) {
-            return trim($this->option('rootNamespace'), '\\') . '\Http\Controllers';
+        if ($this->option('namespace')) {
+            return trim($this->option('namespace'));
         }
 
         return config('generator.namespace.controller');
@@ -73,7 +74,7 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
     protected function rootNamespace()
     {
         if ($this->option('rootNamespace')) {
-            return trim($this->option('rootNamespace'), '\\') . '\\';
+            return trim($this->option('rootNamespace'));
         }
 
         return parent::rootNamespace();
@@ -89,14 +90,18 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
      */
     protected function buildModelReplacements(array $replace)
     {
-        $replace = parent::buildModelReplacements($replace);
+        $modelClass = $this->parseModel($this->option('model'));
 
-        $model = class_basename($this->option('model'));
+        $model = class_basename($modelClass);
 
         return array_merge($replace, [
+            'DummyFullModelClass' => $modelClass,
+            'DummyModelClass' => class_basename($modelClass),
+            'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+
             'DummyPaginator'=> str_plural(lcfirst($model)),
             'DummyViewNamespace' => $this->getViewNamespace($model, $this->option('package')),
-            'DummyRoutePrefix' => $this->getRoutePrefix($model, $this->option('prefix')),
+            'DummyRoutePrefix' => $this->getRoutePrefix($model, $this->option('routePrefix')),
         ]);
     }
 
@@ -114,19 +119,18 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
 
         $model = trim(str_replace('/', '\\', $model), '\\');
 
-        if ($this->option('rootNamespace')) {
-            $rootNamespace = $this->option('rootNamespace');
-        } else {
-            $rootNamespace = config('generator.namespace.model');
-        }
-        $rootNamespace = trim($rootNamespace, '\\') . '\\';
-
         if (class_exists($model)) {
             return $model;
         }
 
+        if ($this->option('package')) {
+            $rootNamespace = trim($this->option('rootNamespace')) . '\Models';
+        } else {
+            $rootNamespace = config('generator.namespace.model');
+        }
+
         if (! starts_with($model, $rootNamespace)) {
-            $model = $rootNamespace . $model;
+            $model = $rootNamespace . '\\' . $model;
         }
 
         return $model;

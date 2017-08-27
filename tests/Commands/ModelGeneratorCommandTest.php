@@ -9,13 +9,16 @@ class ModelGeneratorCommandTest extends TestCase
     /**
      * @group model
      */
-    public function test_basic_create_model()
+    public function test_create_basic_model()
     {
         $this->artisan('gen:model', [
             'name' => 'Foo',
         ]);
 
-        $this->assertFileEquals($this->expectPath . '/Foo.php', $this->outputPath . '/Foo.php');
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Foo.php',
+            $this->outputPath . '/Foo.php'
+        );
     }
 
     /**
@@ -28,7 +31,10 @@ class ModelGeneratorCommandTest extends TestCase
             '--table' => 'bar'
         ]);
 
-        $this->assertFileEquals($this->expectPath . '/Foo_table_bar.php', $this->outputPath . '/Foo.php');
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Foo_custom_table_name.php',
+            $this->outputPath . '/Foo.php'
+        );
     }
 
     /**
@@ -41,7 +47,10 @@ class ModelGeneratorCommandTest extends TestCase
             '--fillable' => 'name,content'
         ]);
 
-        $this->assertFileEquals($this->expectPath . '/Foo_has_fillable.php', $this->outputPath . '/Foo.php');
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Foo_custom_fillable.php',
+            $this->outputPath . '/Foo.php'
+        );
     }
 
     /**
@@ -54,6 +63,42 @@ class ModelGeneratorCommandTest extends TestCase
             '--softDelete' => true
         ]);
 
-        $this->assertFileEquals($this->expectPath . '/Foo_use_softdelete.php', $this->outputPath . '/Foo.php');
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Foo_use_softdelete.php',
+            $this->outputPath . '/Foo.php'
+        );
+    }
+
+    /**
+     * @group model
+     */
+    public function test_create_model_with_namespace()
+    {
+        $this->artisan('gen:model', [
+            'name' => 'Foo',
+            '--namespace' => 'App\Bar\Models'
+        ]);
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Foo_custom_namespace.php',
+            $this->outputPath . '/Foo.php'
+        );
+    }
+
+    /**
+     * @group model
+     */
+    public function test_create_model_with_custom_root_namespace()
+    {
+        $this->artisan('gen:model', [
+            'name' => 'Foo',
+            '--rootNamespace' => 'Test',
+            '--namespace' => 'Test\Sample\Models'
+        ]);
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Foo_custom_root_namespace.php',
+            $this->outputPath . '/Foo.php'
+        );
     }
 }

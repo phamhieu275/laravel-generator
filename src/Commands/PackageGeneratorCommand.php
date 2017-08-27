@@ -182,6 +182,7 @@ class PackageGeneratorCommand extends Command
             $this->call('gen:model', [
                 'name' => $modelName,
                 '--rootNamespace' => $rootNamespace,
+                '--namespace' => $rootNamespace . '\Models',
                 '--path' => $relativePath . '/src/Models'
             ]);
         }
@@ -189,9 +190,11 @@ class PackageGeneratorCommand extends Command
         $this->call('gen:controller', [
             'name' => $this->getControllerName($modelName),
             '--rootNamespace' => $rootNamespace,
+            '--namespace' => $rootNamespace . '\Http\Controllers',
             '--path' => $relativePath . '/src/Http/Controllers',
             '--model' => $modelClass,
-            '--package' => $packageName
+            '--package' => $packageName,
+            '--routePrefix' => $packageName
         ]);
 
         $viewFolderName = $this->getViewNamespace($modelName);

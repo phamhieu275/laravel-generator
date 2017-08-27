@@ -25,7 +25,8 @@ class ModelGeneratorCommand extends ModelMakeCommand
         {--d|softDelete : Indicates if the model uses the soft delete trait}
         {--t|table= : The table name for the model}
         {--fillable= : The comma-separated fillable field list}
-        {--rns|rootNamespace= : The root namespace of model class}
+        {--ns|namespace : The namespace of the model class}
+        {--rns|rootNamespace= : The root namespace of the model class}
         {--m|migration : Create a new migration file for the model}
         {--fa|factory : Create a new factory for the model}
         {--c|controller : Create a new controller for the model}
@@ -102,8 +103,8 @@ class ModelGeneratorCommand extends ModelMakeCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        if ($this->option('rootNamespace')) {
-            return trim($this->option('rootNamespace'), '\\') . '\Models';
+        if ($this->option('namespace')) {
+            return trim($this->option('namespace'));
         }
 
         return config('generator.namespace.model');
@@ -117,7 +118,7 @@ class ModelGeneratorCommand extends ModelMakeCommand
     protected function rootNamespace()
     {
         if ($this->option('rootNamespace')) {
-            return $this->option('rootNamespace');
+            return trim($this->option('rootNamespace'));
         }
 
         return parent::rootNamespace();

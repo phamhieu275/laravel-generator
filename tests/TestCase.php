@@ -2,19 +2,19 @@
 
 namespace Bluecode\Generator\Tests;
 
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Contracts\Console\Kernel;
 use Config;
 use File;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Contracts\Console\Kernel;
 
 class TestCase extends BaseTestCase
 {
     /**
-     * the expect directory path to compare
+     * the expected directory path to compare
      *
      * @var string
      */
-    public $expectPath = __DIR__ . DIRECTORY_SEPARATOR . 'expect';
+    public $expectedPath = __DIR__ . DIRECTORY_SEPARATOR . 'expected';
 
     /**
      * file is created into the output path

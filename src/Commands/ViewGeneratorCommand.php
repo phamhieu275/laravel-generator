@@ -142,32 +142,43 @@ class ViewGeneratorCommand extends GeneratorCommand
         $tableName = str_plural(snake_case($modelName));
         $fields = $this->schemaParser->getFillableColumns($tableName);
 
-        if ($fields->isEmpty()) {
-            return $replaces;
-        }
-
-        if ($name === 'table') {
-            $headerColumns = $bodyColumns = [];
-            foreach ($fields->keys()->all() as $field) {
-                $headerColumns[] = '<th>' . title_case(str_replace('_', ' ', $field)) . '</th>';
-                $bodyColumns[] = '<td>{!! $' . $replaces['DummyModelVariable'] . '->' . $field . ' !!}</td>';
+        if (! $fields->isEmpty()) {
+            switch ($name) {
+                case 'table':
+                    $replaces = $this->buildTableView($replaces, $fields);
+                    break;
+                case 'form':
+                    $replaces['DummyFormInputs'] = $this->buildFormInputs($fields);
+                    break;
+                case 'show':
+                    $replaces['DummyShowFields'] = $this->buildShowFields($fields, camel_case($modelName));
+                    break;
             }
-
-            $glue = "\n" . str_repeat(' ', 16);
-            $replaces['DummyTableHead'] = implode($glue, $headerColumns);
-            $replaces['DummyTableBody'] = implode($glue, $bodyColumns);
         }
-
-        if ($name === 'form') {
-            $replaces['DummyFormInputs'] = $this->buildFormInputs($fields);
-        }
-
-        if ($name === 'show') {
-            $replaces['DummyShowFields'] = $this->buildShowFields($fields, camel_case($modelName));
-        }
-
 
         return str_replace(array_keys($replaces), array_values($replaces), $stub);
+    }
+
+    /**
+     * Build a table view.
+     *
+     * @param array $replaces The replaces
+     * @param array $fields The fields
+     * @return array
+     */
+    private function buildTableView($replaces, $fields)
+    {
+        $headerColumns = $bodyColumns = [];
+        foreach ($fields->keys()->all() as $field) {
+            $headerColumns[] = '<th>' . title_case(str_replace('_', ' ', $field)) . '</th>';
+            $bodyColumns[] = '<td>{!! $' . $replaces['DummyModelVariable'] . '->' . $field . ' !!}</td>';
+        }
+
+        $glue = "\n" . str_repeat(' ', 16);
+        $replaces['DummyTableHead'] = implode($glue, $headerColumns);
+        $replaces['DummyTableBody'] = implode($glue, $bodyColumns);
+
+        return $replaces;
     }
 
     /**

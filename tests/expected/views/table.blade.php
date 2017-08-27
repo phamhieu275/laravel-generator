@@ -1,34 +1,34 @@
 <table class="table table-striped table-bordered">
     <thead>
-        <th>No</th>DummyTableHead
+        <th>No</th>
         <th></th>
     </thead>
     <tbody>
         @php
-        $offset = ($DummyPaginator->currentPage() - 1) * $DummyPaginator->perPage();
-        $total = $DummyPaginator->total();
+        $offset = ($foos->currentPage() - 1) * $foos->perPage();
+        $total = $foos->total();
         @endphp
 
-        @foreach($DummyPaginator as $index => $DummyModelVariable)
+        @foreach($foos as $index => $foo)
         <tr>
-            <td>{{ $index + $offset + 1 }}</td>DummyTableBody
+            <td>{{ $index + $offset + 1 }}</td>
             <td>
                 {!! link_to_route(
-                    'DummyRoutePrefix.show',
+                    'foos.show',
                     __('Show'),
-                    [$DummyModelVariable->id],
+                    [$foo->id],
                     ['class' => 'btn btn-info pull-left']
                 ) !!}
 
                 {!! link_to_route(
-                    'DummyRoutePrefix.edit',
+                    'foos.edit',
                     __('Edit'),
-                    [$DummyModelVariable->id],
+                    [$foo->id],
                     ['class' => 'btn btn-primary pull-left']
                 ) !!}
 
                 {!! Form::open([
-                    'route' => ['DummyRoutePrefix.destroy', $DummyModelVariable->id],
+                    'route' => ['foos.destroy', $foo->id],
                     'method' => 'DELETE',
                     'onSubmit' => "return confirm('Are you sure wants to delete this record ?')",
                 ]) !!}
