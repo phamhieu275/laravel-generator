@@ -3,6 +3,8 @@
 namespace Bluecode\Generator\Commands;
 
 use Illuminate\Routing\Console\ControllerMakeCommand;
+use Symfony\Component\Console\Input\InputOption;
+
 use Bluecode\Generator\Traits\TemplateTrait;
 use Bluecode\Generator\Traits\GeneratorCommandTrait;
 
@@ -12,22 +14,11 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
     use GeneratorCommandTrait;
 
     /**
-     * The signature of the console command.
+     * The name of the console command.
      *
      * @var string
      */
-    protected $signature = 'gen:controller
-        {name : The name of the controller (with the Controller suffix)}
-        {--f|force : Force overwriting existing files}
-        {--m|model= : Generate a resource controller for the given model}
-        {--r|resource= : Generate a resource controller class}
-        {--p|parent= : Generate a nested resource controller class}
-        {--pk|package= : The package name to generate into}
-        {--path= : The relative path the controller is generated}
-        {--ns|namespace= : The namespace of the controller class}
-        {--rns|rootNamespace= : The root namespace of the controller class}
-        {--rp|routePrefix= : The prefix route}
-    ';
+    protected $name = 'gen:controller';
 
     /**
      * Get the stub file for the generator.
@@ -38,17 +29,11 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
     {
         $templatePath = $this->getTemplatePath();
 
-        if ($this->option('parent')) {
-            $stubPath = $templatePath . '/controller.nested.stub';
-        } elseif ($this->option('model')) {
-            $stubPath = $templatePath . '/controller.model.stub';
-        } elseif ($this->option('resource')) {
-            $stubPath = $templatePath . '/controller.stub';
-        } else {
-            $stubPath = $templatePath . '/controller.plain.stub';
+        if ($this->option('model')) {
+            return $templatePath . '/controller.model.stub';
         }
 
-        return $stubPath;
+        return $templatePath . '/' . basename(parent::getStub());
     }
 
     /**
@@ -134,5 +119,27 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
         }
 
         return $model;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return array_merge(parent::getOptions(), [
+            ['overwrite', null, InputOption::VALUE_NONE, 'Force overwriting existing files'],
+
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The location where the model file should be created'],
+
+            ['namespace', null, InputOption::VALUE_OPTIONAL, 'The namespace of the model'],
+
+            ['rootNamespace', null, InputOption::VALUE_OPTIONAL, 'The root namespace of the model'],
+
+            ['package', null, InputOption::VALUE_OPTIONAL, 'The package name which the model is created'],
+
+            ['routePrefix', null, InputOption::VALUE_OPTIONAL, 'The prefix route'],
+        ]);
     }
 }

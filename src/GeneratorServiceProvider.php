@@ -23,7 +23,7 @@ class GeneratorServiceProvider extends ServiceProvider
 
             $templatePath = __DIR__ . '/../templates';
             $this->publishes([
-                $templatePath => config('generator.path.templates'),
+                $templatePath => config('generator.path.template'),
             ], 'laravel-generator.template');
         }
     }

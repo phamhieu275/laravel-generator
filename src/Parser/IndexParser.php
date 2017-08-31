@@ -13,11 +13,11 @@ class IndexParser
      */
     public function parse($columns, $indexes)
     {
-        $flag = $this->hasAutoIncrementColumn($columns);
+        $hasAutoIncrementColumn = $this->hasAutoIncrementColumn($columns);
 
         $result = [];
         foreach ($indexes as $name => $index) {
-            if ($index->isPrimary() && $flag) {
+            if ($index->isPrimary() && $hasAutoIncrementColumn) {
                 continue;
             }
 

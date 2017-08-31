@@ -144,7 +144,7 @@ e.g.
 
 ## Option
 
-Use --force or -f to overwrite exist file on all command.
+Use --overwrite to overwrite exist file on all command.
 
 Credits
 --------

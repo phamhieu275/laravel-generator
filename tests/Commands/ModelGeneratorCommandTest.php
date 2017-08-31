@@ -2,10 +2,27 @@
 
 namespace Bluecode\Generator\Tests\Commands;
 
+use Artisan;
+use DB;
+use File;
 use Bluecode\Generator\Tests\TestCase;
 
 class ModelGeneratorCommandTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        DB::unprepared(File::get(__DIR__ . '/../sql/create_bars_table.sql'));
+    }
+
+    public function tearDown()
+    {
+        DB::statement('DROP TABLE IF EXISTS `bars`');
+
+        parent::tearDown();
+    }
+
     /**
      * @group model
      */
@@ -98,6 +115,84 @@ class ModelGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo_custom_root_namespace.php',
+            $this->outputPath . '/Foo.php'
+        );
+    }
+
+    /**
+     * @group model
+     */
+    public function test_create_model_with_existed_table()
+    {
+        $this->artisan('gen:model', [
+            'name' => 'Bar',
+        ]);
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Bar.php',
+            $this->outputPath . '/Bar.php'
+        );
+    }
+
+    /**
+     * @group model
+     */
+    public function test_create_model_and_migration()
+    {
+        $this->artisan('gen:model', [
+            'name' => 'Bar',
+            '--migration' => true
+        ]);
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Bar.php',
+            $this->outputPath . '/Bar.php'
+        );
+
+        preg_match('/[0-9_]*_create_bars_table/', Artisan::output(), $matches);
+
+        $this->assertCount(1, $matches);
+        $this->assertFileEquals(
+            $this->expectedPath . '/migrations/create_bars_table.php',
+            $this->outputPath . "/{$matches[0]}.php"
+        );
+    }
+
+    /**
+     * @group model
+     */
+    public function test_create_model_and_controller()
+    {
+        $this->artisan('gen:model', [
+            'name' => 'Bar',
+            '--controller' => true,
+            '--resource' => true
+        ]);
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Bar.php',
+            $this->outputPath . '/Bar.php'
+        );
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/controllers/BarController.php',
+            $this->outputPath . '/BarController.php'
+        );
+    }
+
+    /**
+     * @group model
+     */
+    public function test_create_basic_model_with_overwrite_option()
+    {
+        File::put($this->outputPath . '/Foo.php', 'abc');
+        $this->artisan('gen:model', [
+            'name' => 'Foo',
+            '--overwrite' => true
+        ]);
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/models/Foo.php',
             $this->outputPath . '/Foo.php'
         );
     }

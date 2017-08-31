@@ -2,7 +2,7 @@
 
 namespace Bluecode\Generator\Traits;
 
-use Illuminate\Support\Facades\File;
+use File;
 use Symfony\Component\Console\Exception\RuntimeException;
 
 trait ManipulatesPackageTrait
@@ -15,8 +15,6 @@ trait ManipulatesPackageTrait
      */
     protected function createPackageFolder($packagePath)
     {
-        $this->info('Create package folder.');
-
         if (File::exists($packagePath)) {
             $this->info('Package folder already exists. Skipping.');
 
@@ -32,27 +30,5 @@ trait ManipulatesPackageTrait
         }
 
         $this->info('Package folder created successfully.');
-    }
-
-    /**
-     * Remove package folder.
-     *
-     * @param string $packagePath The package path
-     * @throws RuntimeException
-     * @return void
-     */
-    protected function removePackageFolder($packagePath)
-    {
-        $this->info('Remove package folder.');
-
-        if (File::exists($packagePath)) {
-            if (! File::deleteDirectory($packagePath)) {
-                throw new RuntimeException('Cannot remove package folder');
-            }
-
-            $this->info('Package folder removed successfully.');
-        } else {
-            $this->info('Package folder does not exists. Skipping.');
-        }
     }
 }

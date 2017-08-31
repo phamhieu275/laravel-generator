@@ -12,7 +12,7 @@ trait GeneratorCommandTrait
      */
     public function alreadyExists($rawName)
     {
-        if ($this->hasOption('force') && $this->option('force')) {
+        if ($this->hasOption('overwrite') && $this->option('overwrite')) {
             return false;
         }
 
@@ -28,7 +28,13 @@ trait GeneratorCommandTrait
     public function getPath($name)
     {
         if ($this->hasOption('path') && $this->option('path')) {
-            return $this->option('path') . DIRECTORY_SEPARATOR . class_basename($name) . '.php';
+            if ($this->hasOption('package') && $this->option('package')) {
+                $basePath = config('generator.path.package');
+            } else {
+                $basePath =  $this->laravel['path'];
+            }
+            
+            return $basePath . '/'. trim($this->option('path')) . DIRECTORY_SEPARATOR . class_basename($name) . '.php';
         }
 
         $path = config('generator.path.' . strtolower($this->type));

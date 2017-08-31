@@ -73,4 +73,19 @@ class ControllerGeneratorCommandTest extends TestCase
             $this->outputPath . '/FooController.php'
         );
     }
+
+    /**
+     * @group controller
+     */
+    public function test_create_plain_controller()
+    {
+        $this->artisan('gen:controller', [
+            'name' => 'FooController'
+        ]);
+
+        $this->assertFileEquals(
+            $this->expectedPath . '/controllers/FooController_plain.php',
+            $this->outputPath . '/FooController.php'
+        );
+    }
 }

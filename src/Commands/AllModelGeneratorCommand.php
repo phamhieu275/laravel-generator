@@ -16,7 +16,7 @@ class AllModelGeneratorCommand extends Command
      * @var string
      */
     protected $signature = 'gen:all:model
-        {--f|force : Force overwriting existing files}
+        {--overwrite : Force overwriting existing files}
         {--o|only= : The only model list to generate}
         {--e|exclude= : The exclude model list to not generate}
     ';
@@ -50,10 +50,10 @@ class AllModelGeneratorCommand extends Command
         $models = $this->getListModel();
 
         foreach ($models as $model) {
-            $this->comment("Create {$model} model class.");
+            $this->comment("Generate {$model} model class.");
             $this->callSilent('gen:model', [
                 'name' => $model,
-                '--force' => $this->option('force'),
+                '--overwrite' => $this->option('overwrite'),
             ]);
         }
     }

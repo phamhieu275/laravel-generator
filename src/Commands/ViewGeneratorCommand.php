@@ -22,7 +22,7 @@ class ViewGeneratorCommand extends GeneratorCommand
     protected $signature = 'gen:view
         {name : The name of the view}
         {model : The name of the model}
-        {--f|force : Force overwriting existing files}
+        {--overwrite : Force overwriting existing files}
         {--p|path= : The location where the view file should be created}
         {--pk|package= : The package name}
     ';
@@ -107,13 +107,18 @@ class ViewGeneratorCommand extends GeneratorCommand
     protected function getPath($name)
     {
         if ($this->option('path')) {
-            $basePath = trim($this->option('path'), '/');
-        } else {
-            $viewFolderName = $this->getViewNamespace($this->argument('model'));
-            $basePath = config('generator.path.view') . '/' . $viewFolderName;
+            if ($this->option('package')) {
+                $basePath = config('generator.path.package');
+            } else {
+                $basePath = $this->laravel['path'];
+            }
+
+            return $basePath . '/' . trim($this->option('path')) . '/' . "{$name}.blade.php";
         }
 
-        return $basePath . '/' . "{$name}.blade.php";
+        $viewFolderName = $this->getViewNamespace($this->argument('model'));
+
+        return config('generator.path.view') . '/' . $viewFolderName . '/' . "{$name}.blade.php";
     }
 
     /**
@@ -174,9 +179,9 @@ class ViewGeneratorCommand extends GeneratorCommand
             $bodyColumns[] = '<td>{!! $' . $replaces['DummyModelVariable'] . '->' . $field . ' !!}</td>';
         }
 
-        $glue = "\n" . str_repeat(' ', 16);
-        $replaces['DummyTableHead'] = implode($glue, $headerColumns);
-        $replaces['DummyTableBody'] = implode($glue, $bodyColumns);
+        $glue = "\n" . str_repeat(' ', 12);
+        $replaces['DummyTableHead'] = $glue. implode($glue, $headerColumns);
+        $replaces['DummyTableBody'] = $glue . implode($glue, $bodyColumns);
 
         return $replaces;
     }
@@ -199,7 +204,11 @@ class ViewGeneratorCommand extends GeneratorCommand
         ];
         foreach ($fields as $field) {
             switch ($field->getType()->getName()) {
+                case 'tinyint':
+                case 'smallint':
+                case 'mediumint':
                 case 'integer':
+                case 'bigint':
                     $inputType = 'number';
                     break;
                 case 'text':

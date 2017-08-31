@@ -49,17 +49,7 @@ class AllMigrationGeneratorCommand extends Command
      */
     public function handle()
     {
-        if ($this->option('only')) {
-            $tables = explode(',', trim($this->option('only')));
-        } else {
-            $tables = $this->schema->getTables();
-        }
-
-        if ($this->option('exclude')) {
-            $excludeTables = explode(',', trim($this->option('exclude')));
-            $tables = array_diff($tables, $excludeTables);
-        }
-
+        $tables = $this->getListTable();
         foreach ($tables as $table) {
             $name = "create_{$table}_table";
             if (class_exists(studly_case($name))) {
@@ -86,5 +76,26 @@ class AllMigrationGeneratorCommand extends Command
         }
 
         return config('generator.path.migration');
+    }
+
+    /**
+     * Get the list table from schema
+     *
+     * @return array
+     */
+    private function getListTable()
+    {
+        if ($this->option('only')) {
+            $tables = explode(',', trim($this->option('only')));
+        } else {
+            $tables = $this->schema->getTables();
+        }
+
+        if ($this->option('exclude')) {
+            $excludeTables = explode(',', trim($this->option('exclude')));
+            $tables = array_diff($tables, $excludeTables);
+        }
+
+        return $tables;
     }
 }

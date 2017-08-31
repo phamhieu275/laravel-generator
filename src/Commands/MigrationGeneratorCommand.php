@@ -39,8 +39,8 @@ class MigrationGeneratorCommand extends MigrateMakeCommand
      */
     protected function getMigrationPath()
     {
-        if (! is_null($targetPath = $this->input->getOption('path'))) {
-            return $this->laravel->basePath().'/'.$targetPath;
+        if ($this->option('path')) {
+            return parent::getMigrationPath();
         }
 
         return config('generator.path.migration');
