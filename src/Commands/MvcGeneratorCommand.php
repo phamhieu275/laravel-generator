@@ -18,7 +18,7 @@ class MvcGeneratorCommand extends Command
      */
     protected $signature = 'gen:mvc
         {model : The name of the model}
-        {--f|force : Force overwriting existing files}
+        {--overwrite : Force overwriting existing files}
         {--a|actions= : The comma-separated action list}
     ';
 
@@ -40,20 +40,20 @@ class MvcGeneratorCommand extends Command
 
         $this->call('gen:model', [
             'name' => $modelName,
-            '--force' => $this->option('force'),
+            '--overwrite' => $this->option('overwrite'),
         ]);
 
         $this->call('gen:controller', [
             'name' => $this->getControllerName($modelName),
             '--model' => config('generator.namespace.model') . '\\' . $modelName,
-            '--force' => $this->option('force')
+            '--overwrite' => $this->option('overwrite')
         ]);
 
         foreach ($this->getListView($this->option('actions')) as $view) {
             $this->call('gen:view', [
                 'name' => $view,
                 'model' => $modelName,
-                '--force' => $this->option('force')
+                '--overwrite' => $this->option('overwrite')
             ]);
         }
     }

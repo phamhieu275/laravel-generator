@@ -22,7 +22,7 @@ class ViewGeneratorCommand extends GeneratorCommand
     protected $signature = 'gen:view
         {name : The name of the view}
         {model : The name of the model}
-        {--f|force : Force overwriting existing files}
+        {--overwrite : Force overwriting existing files}
         {--p|path= : The location where the view file should be created}
         {--pk|package= : The package name}
     ';

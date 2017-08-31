@@ -26,7 +26,7 @@ class PackageGeneratorCommand extends Command
         {vendor : The vendor part of the namespace}
         {package : The name of package for the namespace}
         {--i|interactive : Interactive mode}
-        {--f|force : Force overwriting existing files}
+        {--overwrite : Force overwriting existing files}
         {--p|path= : The location where the package should be created}
         {--m|model= : The model class name}
         {--a|actions= : The comma-separated action list}

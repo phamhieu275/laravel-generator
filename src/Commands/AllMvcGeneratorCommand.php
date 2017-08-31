@@ -20,7 +20,7 @@ class AllMvcGeneratorCommand extends Command
      * @var string
      */
     protected $signature = 'gen:all:mvc
-        {--f|force : Force overwriting existing files}
+        {--overwrite : Force overwriting existing files}
         {--o|only= : The only model list to generate}
         {--e|exclude= : The exclude model list to not generate}
         {--a|actions= : The comma-separated action list}
@@ -57,26 +57,26 @@ class AllMvcGeneratorCommand extends Command
         $views = $this->getListView($this->option('actions'));
 
         foreach ($models as $model) {
-            $this->comment("Create {$model} model class.");
+            $this->comment("Generate {$model} model class.");
             $this->callSilent('gen:model', [
                 'name' => $model,
-                '--force' => $this->option('force'),
+                '--overwrite' => $this->option('overwrite'),
             ]);
 
             $controllerName = $this->getControllerName($model);
-            $this->comment("Create {$controllerName} class.");
+            $this->comment("Generate {$controllerName} class.");
             $this->callSilent('gen:controller', [
                 'name' => $controllerName,
                 '--model' => $model,
-                '--force' => $this->option('force'),
+                '--overwrite' => $this->option('overwrite'),
             ]);
 
-            $this->comment("Create views for {$controllerName}.");
+            $this->comment("Generate views for {$controllerName}.");
             foreach ($views as $view) {
                 $this->call('gen:view', [
                     'name' => $view,
                     'model' => $model,
-                    '--force' => $this->option('force'),
+                    '--overwrite' => $this->option('overwrite'),
                 ]);
             }
         }

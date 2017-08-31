@@ -5,6 +5,7 @@ namespace Bluecode\Generator\Tests;
 use Config;
 use File;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+// use PHPUnit\Framework\TestCase as BaseTestCase;
 use Illuminate\Contracts\Console\Kernel;
 
 class TestCase extends BaseTestCase

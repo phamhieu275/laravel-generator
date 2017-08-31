@@ -183,12 +183,12 @@ class ModelGeneratorCommandTest extends TestCase
     /**
      * @group model
      */
-    public function test_create_basic_model_with_force_option()
+    public function test_create_basic_model_with_overwrite_option()
     {
         File::put($this->outputPath . '/Foo.php', 'abc');
         $this->artisan('gen:model', [
             'name' => 'Foo',
-            '--force' => true
+            '--overwrite' => true
         ]);
 
         $this->assertFileEquals(

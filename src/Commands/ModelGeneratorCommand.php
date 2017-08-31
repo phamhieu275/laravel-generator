@@ -4,6 +4,8 @@ namespace Bluecode\Generator\Commands;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Console\ModelMakeCommand;
+use Symfony\Component\Console\Input\InputOption;
+
 use Bluecode\Generator\Parser\SchemaParser;
 use Bluecode\Generator\Traits\TemplateTrait;
 use Bluecode\Generator\Traits\GeneratorCommandTrait;
@@ -14,25 +16,11 @@ class ModelGeneratorCommand extends ModelMakeCommand
     use GeneratorCommandTrait;
 
     /**
-     * The signature of the console command.
+     * The name of the console command.
      *
      * @var string
      */
-    protected $signature = 'gen:model
-        {name : The name of the model}
-        {--f|force : Force overwriting existing files}
-        {--p|path= : The location where the model file should be created}
-        {--d|softDelete : Indicates if the model uses the soft delete trait}
-        {--t|table= : The table name for the model}
-        {--fillable= : The comma-separated fillable field list}
-        {--ns|namespace : The namespace of the model class}
-        {--rns|rootNamespace= : The root namespace of the model class}
-        {--m|migration : Create a new migration file for the model}
-        {--fa|factory : Create a new factory for the model}
-        {--c|controller : Create a new controller for the model}
-        {--r|resource : Indicates if the generated controller should be a resource controller}
-        {--pk|package= : The package name}
-    ';
+    protected $name = 'gen:model';
 
     /**
      * Create a new controller creator command instance.
@@ -76,7 +64,7 @@ class ModelGeneratorCommand extends ModelMakeCommand
         $this->call('gen:controller', [
             'name' => "{$controller}Controller",
             '--model' => $this->option('resource') ? $modelName : null,
-            '--force' => $this->option('force')
+            '--overwrite' => $this->option('overwrite')
         ]);
     }
 
@@ -210,5 +198,31 @@ class ModelGeneratorCommand extends ModelMakeCommand
             })
             ->flatten()
             ->implode(', ');
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return array_merge(parent::getOptions(), [
+            ['overwrite', null, InputOption::VALUE_NONE, 'Force overwriting existing files'],
+
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The location where the model file should be created'],
+
+            ['softDelete', 'd', InputOption::VALUE_NONE, 'Indicates if the model uses the soft delete trait'],
+
+            ['table', 't', InputOption::VALUE_OPTIONAL, 'The table name for the model'],
+
+            ['fillable', null, InputOption::VALUE_OPTIONAL, 'The comma-separated fillable fields for the model'],
+
+            ['namespace', null, InputOption::VALUE_OPTIONAL, 'The namespace of the model'],
+
+            ['rootNamespace', null, InputOption::VALUE_OPTIONAL, 'The root namespace of the model'],
+
+            ['package', null, InputOption::VALUE_OPTIONAL, 'The package name which the model is created'],
+        ]);
     }
 }

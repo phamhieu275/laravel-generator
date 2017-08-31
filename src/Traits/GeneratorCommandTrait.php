@@ -12,7 +12,7 @@ trait GeneratorCommandTrait
      */
     public function alreadyExists($rawName)
     {
-        if ($this->hasOption('force') && $this->option('force')) {
+        if ($this->hasOption('overwrite') && $this->option('overwrite')) {
             return false;
         }
 

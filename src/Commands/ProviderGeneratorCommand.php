@@ -4,6 +4,7 @@ namespace Bluecode\Generator\Commands;
 
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Symfony\Component\Console\Input\InputOption;
+
 use Bluecode\Generator\Traits\TemplateTrait;
 use Bluecode\Generator\Traits\GeneratorCommandTrait;
 
@@ -13,17 +14,11 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
     use GeneratorCommandTrait;
 
     /**
-     * The signature of the console command.
+     * The name of the console command.
      *
      * @var string
      */
-    protected $signature = 'gen:provider
-        {name : The name of the provider}
-        {--rns|rootNamespace= : The root namespace of the provider class}
-        {--pk|package= : The name of the package}
-        {--p|path= : The path position to generate}
-        {--m|model : Use provider.model template}
-    ';
+    protected $name = 'gen:provider';
 
     /**
      * Get the stub file for the generator.
@@ -88,5 +83,25 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
         }
 
         return parent::buildClass($name);
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return array_merge(parent::getOptions(), [
+            ['overwrite', null, InputOption::VALUE_NONE, 'Force overwriting existing files'],
+
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The location where the model file should be created'],
+
+            ['rootNamespace', null, InputOption::VALUE_OPTIONAL, 'The root namespace of the model'],
+
+            ['package', null, InputOption::VALUE_OPTIONAL, 'The package name which the model is created'],
+
+            ['model', null, InputOption::VALUE_NONE, 'Generate the provider for the given model'],
+        ]);
     }
 }
