@@ -45,7 +45,7 @@ class TestCase extends BaseTestCase
             File::makeDirectory($this->outputPath);
         }
 
-        $this->setTempConfig();
+        $this->setConfig();
     }
 
     public function tearDown()
@@ -60,11 +60,13 @@ class TestCase extends BaseTestCase
      *
      * @return void
      */
-    public function setTempConfig()
+    public function setConfig()
     {
         Config::set('generator.path.migration', $this->outputPath);
         Config::set('generator.path.model', $this->outputPath);
         Config::set('generator.path.controller', $this->outputPath);
         Config::set('generator.path.view', $this->outputPath);
+        Config::set('generator.path.provider', $this->outputPath);
+        Config::set('generator.path.package', $this->outputPath);
     }
 }

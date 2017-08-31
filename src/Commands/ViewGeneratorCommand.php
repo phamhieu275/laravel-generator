@@ -107,13 +107,18 @@ class ViewGeneratorCommand extends GeneratorCommand
     protected function getPath($name)
     {
         if ($this->option('path')) {
-            $basePath = trim($this->option('path'));
-        } else {
-            $viewFolderName = $this->getViewNamespace($this->argument('model'));
-            $basePath = config('generator.path.view') . '/' . $viewFolderName;
+            if ($this->option('package')) {
+                $basePath = config('generator.path.package');
+            } else {
+                $basePath = $this->laravel['path'];
+            }
+
+            return $basePath . '/' . trim($this->option('path')) . '/' . "{$name}.blade.php";
         }
 
-        return $basePath . '/' . "{$name}.blade.php";
+        $viewFolderName = $this->getViewNamespace($this->argument('model'));
+
+        return config('generator.path.view') . '/' . $viewFolderName . '/' . "{$name}.blade.php";
     }
 
     /**
@@ -199,7 +204,11 @@ class ViewGeneratorCommand extends GeneratorCommand
         ];
         foreach ($fields as $field) {
             switch ($field->getType()->getName()) {
+                case 'tinyint':
+                case 'smallint':
+                case 'mediumint':
                 case 'integer':
+                case 'bigint':
                     $inputType = 'number';
                     break;
                 case 'text':

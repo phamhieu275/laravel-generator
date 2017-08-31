@@ -40,7 +40,7 @@ trait InteractsWithUserTrait
      */
     protected function getVendorFolderName($vendor)
     {
-        $vendorFolderName = strtolower($vendor);
+        $vendorFolderName = snake_case($vendor);
 
         return $this->askUser('The vendor folder name', $vendorFolderName);
     }

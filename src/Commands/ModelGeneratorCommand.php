@@ -31,6 +31,7 @@ class ModelGeneratorCommand extends ModelMakeCommand
         {--fa|factory : Create a new factory for the model}
         {--c|controller : Create a new controller for the model}
         {--r|resource : Indicates if the generated controller should be a resource controller}
+        {--pk|package= : The package name}
     ';
 
     /**

@@ -5,10 +5,12 @@ namespace Bluecode\Generator\Commands;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Bluecode\Generator\Traits\TemplateTrait;
+use Bluecode\Generator\Traits\GeneratorCommandTrait;
 
 class ProviderGeneratorCommand extends ProviderMakeCommand
 {
     use TemplateTrait;
+    use GeneratorCommandTrait;
 
     /**
      * The signature of the console command.
@@ -17,9 +19,10 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
      */
     protected $signature = 'gen:provider
         {name : The name of the provider}
-        {--p|path= : The path to generate into}
-        {--rns|rootNamespace= : The root namespace of the provider}
+        {--rns|rootNamespace= : The root namespace of the provider class}
         {--pk|package= : The name of the package}
+        {--p|path= : The path position to generate}
+        {--m|model : Use provider.model template}
     ';
 
     /**
@@ -31,8 +34,8 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
     {
         $templatePath = $this->getTemplatePath();
 
-        if ($this->option('package')) {
-            return $templatePath . '/package/provider.stub';
+        if ($this->option('model')) {
+            return $templatePath . '/package/provider.model.stub';
         }
 
         return $templatePath . '/provider.stub';
@@ -68,21 +71,6 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
     }
 
     /**
-     * Get the destination class path.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function getPath($name)
-    {
-        if ($this->option('path')) {
-            return trim($this->option('path'), '/') . '/' . $this->argument('name') . '.php';
-        }
-
-        return parent::getPath($name);
-    }
-
-    /**
      * Build the class with the given name.
      *
      * @param  string  $name
@@ -90,10 +78,10 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
      */
     protected function buildClass($name)
     {
-        if ($this->option('package')) {
+        if ($this->option('package') && $this->option('model')) {
             $replaces = [
-                'DummyControllerNamespace' => $this->rootNamespace() . '\\Http\\Controllers',
-                'DummyPackage' => $this->option('package'),
+                'DummyControllerNamespace' => $this->rootNamespace() . '\Http\Controllers',
+                'DummyPackage' => $this->getPackageViewNamespace($this->option('package')),
             ];
 
             return str_replace(array_keys($replaces), array_values($replaces), parent::buildClass($name));

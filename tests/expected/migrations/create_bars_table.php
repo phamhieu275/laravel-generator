@@ -14,13 +14,13 @@ class CreateBarsTable extends Migration
     public function up()
     {
         Schema::create('bars', function (Blueprint $table) {
-            $table->integer('id', true, false);
+            $table->increments('id');
             $table->string('name', 100)->nullable();
             $table->text('content')->nullable();
             $table->date('publish_date')->nullable();
-            $table->integer('author_id', false, true)->nullable()->default(1);
+            $table->unsignedBigInteger('author_id')->nullable()->default(1);
             $table->float('rate', 10, 0)->nullable();
-            $table->decimal('score', 10, 2)->nullable();
+            $table->unsignedDecimal('score', 10, 2)->nullable();
             $table->softDeletes();
             $table->timestamps();
             $table->unique(['name'], 'unique_name');

@@ -11,7 +11,7 @@ trait TemplateTrait
      */
     public function getTemplatePath()
     {
-        $templatePath = config('generator.path.templates');
+        $templatePath = config('generator.path.template');
 
         if (! is_dir($templatePath)) {
             return __DIR__ . '/../../templates';
@@ -32,10 +32,21 @@ trait TemplateTrait
         $viewFolder = str_plural(snake_case(strtolower($modelName)));
 
         if (! empty($packageName)) {
-            return snake_case($packageName) . "::" . $viewFolder;
+            return $this->getPackageViewNamespace($packageName) . "::" . $viewFolder;
         }
 
         return $viewFolder;
+    }
+
+    /**
+     * Get the package view namespace.
+     *
+     * @param string $packageName The package name
+     * @return string
+     */
+    public function getPackageViewNamespace($packageName)
+    {
+        return snake_case($packageName);
     }
 
     /**

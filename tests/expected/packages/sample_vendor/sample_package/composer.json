@@ -1,0 +1,7 @@
+{
+    "name": "SamplePackage",
+    "description": "",
+    "authors": "",
+    "minimum-stability": "dev",
+    "require": {}
+}

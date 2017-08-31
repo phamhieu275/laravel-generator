@@ -50,7 +50,9 @@ class ColumnParser
                 $field[] = ['nullable'];
             }
 
-            $field = array_merge($field, $this->getDefaultValue($column));
+            if (! is_null($column->getDefault())) {
+                $field[] = $this->getDefaultValue($column);
+            }
 
             if (! is_null($column->getComment())) {
                 $field[] = ['comment', $this->addQuote($column->getComment())];
@@ -88,15 +90,27 @@ class ColumnParser
             $type = str_replace('int', 'Integer', $type);
         }
 
-        $hasIncrement = $column->getAutoincrement() ? 'true' : 'false';
-        $hasUnsigned = $column->getUnsigned() ? 'true' : 'false';
+        $hasIncrement = $column->getAutoincrement();
+        $hasUnsigned = $column->getUnsigned();
 
-        return [
-            $type,
-            $this->addQuote($column->getName()),
-            $hasIncrement,
-            $hasUnsigned
-        ];
+        $name = $this->addQuote($column->getName());
+
+        // only auto-increment
+        if ($hasIncrement && ! $hasUnsigned) {
+            return [$type, $name, 'true'];
+        }
+
+        // both is true
+        if ($hasIncrement && $hasUnsigned) {
+            $type = lcfirst(str_replace('Integer', 'Increments', ucfirst($type)));
+        }
+
+        // only unsigned
+        if (! $hasIncrement && $hasUnsigned) {
+            $type = 'unsigned' . ucfirst($type);
+        }
+
+        return [$type, $name];
     }
 
     /**
@@ -165,20 +179,18 @@ class ColumnParser
      */
     private function getDefaultValue($column)
     {
-        if (is_null($column->getDefault())) {
-            return [];
-        }
-
         $defaultValue = $column->getDefault();
         $type = $column->getType()->getName();
 
         if ($type === 'timestamp' && $defaultValue === 'CURRENT_TIMESTAMP') {
-            $defaultValue = "DB::raw('CURRENT_TIMESTAMP')";
-        } elseif (strpos($type, 'int') === false) {
+            return ['default', "DB::raw('CURRENT_TIMESTAMP')"];
+        }
+
+        if (strpos($type, 'int') === false && $type !== 'boolean') {
             $defaultValue = $this->addQuote($defaultValue);
         }
 
-        return [['default', $defaultValue]];
+        return ['default', $defaultValue];
     }
 
     /**

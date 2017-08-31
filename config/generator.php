@@ -10,7 +10,7 @@ return [
     |
     */
     'path' => [
-        'templates' => resource_path('vendor/laravel-generator/templates'),
+        'template' => resource_path('vendor/laravel-generator/templates'),
 
         'migration' => base_path('database/migrations'),
 
@@ -19,6 +19,10 @@ return [
         'controller' => app_path('Http/Controllers'),
 
         'view' => resource_path('views'),
+
+        'provider' => app_path('Providers'),
+
+        'package' => base_path(),
     ],
 
     /*
@@ -43,13 +47,4 @@ return [
      'view' => [
         'layout' => 'default'
      ],
-
-    /*
-     |--------------------------------------------------------------------------
-     | Package
-     |--------------------------------------------------------------------------
-     */
-    'package' => [
-        'base_path'           => base_path(),
-    ]
 ];

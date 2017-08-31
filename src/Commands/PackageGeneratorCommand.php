@@ -72,8 +72,10 @@ class PackageGeneratorCommand extends Command
             $this->generateResource($rootNamespace, $packageName, $relativePath, $this->option('model'));
         }
 
-        $this->info('Running composer dump-autoload. Please wait a minute.');
-        $this->composer->dumpAutoloads();
+        if (! $this->option('no-interaction')) {
+            $this->info('Running composer dump-autoload. Please wait a minute.');
+            $this->composer->dumpAutoloads();
+        }
 
         $this->comment('Please copy the following line into config/app.php file.');
         $this->info($rootNamespace . '\\' . studly_case($packageName) . 'PackageProvider::class');
@@ -91,7 +93,7 @@ class PackageGeneratorCommand extends Command
     protected function getRelativePath($vendorName, $packageName)
     {
         if ($this->option('path')) {
-            return trim($this->option('path'), '/');
+            return trim($this->option('path'));
         }
 
         $vendorFolderName = $this->getVendorFolderName($vendorName);
@@ -108,7 +110,7 @@ class PackageGeneratorCommand extends Command
      */
     protected function getPackagePath($relativePath)
     {
-        return config('generator.package.base_path') . '/' . $relativePath;
+        return config('generator.path.package') . '/' . $relativePath;
     }
 
     /**
@@ -126,18 +128,7 @@ class PackageGeneratorCommand extends Command
 
         $this->createComposerFile($packagePath, $packageName);
 
-        $providerArguments = [
-            'name' => studly_case($packageName) . 'PackageProvider',
-            '--rootNamespace' => $rootNamespace,
-            '--path' => "{$relativePath}/src"
-        ];
-
-        if ($this->option('model')) {
-            $providerArguments = array_merge($providerArguments, [
-                '--package' => studly_case($packageName)
-            ]);
-        }
-        $this->call('gen:provider', $providerArguments);
+        $this->generateProvider($rootNamespace, $packageName, $relativePath);
     }
 
     /**
@@ -151,6 +142,7 @@ class PackageGeneratorCommand extends Command
     {
         $filePath = $packagePath . '/composer.json';
         if ($this->files->exists($filePath)) {
+            $this->info('composer.json already exists!');
             return;
         }
 
@@ -160,6 +152,30 @@ class PackageGeneratorCommand extends Command
         $this->files->put($filePath, $stub);
 
         $this->info('composer.json created successfully.');
+    }
+
+    /**
+     * Create the provider class
+     *
+     * @param string $rootNamespace The root namespace
+     * @param string $packageName The package name
+     * @param string $relativePath The relative path
+     * @return void
+     */
+    private function generateProvider($rootNamespace, $packageName, $relativePath)
+    {
+        $arguments = [
+            'name' => studly_case($packageName) . 'PackageProvider',
+            '--rootNamespace' => $rootNamespace,
+            '--path' => "{$relativePath}/src",
+            '--package' => $packageName
+        ];
+
+        if ($this->option('model')) {
+            $arguments['--model'] = true;
+        }
+
+        $this->call('gen:provider', $arguments);
     }
 
     /**
@@ -183,7 +199,8 @@ class PackageGeneratorCommand extends Command
                 'name' => $modelName,
                 '--rootNamespace' => $rootNamespace,
                 '--namespace' => $rootNamespace . '\Models',
-                '--path' => $relativePath . '/src/Models'
+                '--path' => $relativePath . '/src/Models',
+                '--package' => $packageName
             ]);
         }
 
@@ -231,16 +248,22 @@ class PackageGeneratorCommand extends Command
         ];
         $stub = str_replace(array_keys($replaces), array_values($replaces), $stub);
 
-        if ($this->files->exists($filePath)) {
-            $stub = str_replace("<?php\n", '', $stub);
-
-            $this->files->append($filePath, $stub);
-
-            $this->info('routes.php updated successfully');
-        } else {
+        if (! $this->files->exists($filePath)) {
             $this->files->put($filePath, $stub);
 
             $this->info('routes.php created successfully.');
+            return;
         }
+
+        $stub = str_replace("<?php\n", '', $stub);
+        $content = $this->files->get($filePath);
+
+        if (strpos($content, $stub) !== false) {
+            return;
+        }
+
+        $this->files->append($filePath, $stub);
+
+        $this->info('routes.php updated successfully');
     }
 }
