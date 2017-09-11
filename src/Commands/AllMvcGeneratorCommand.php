@@ -58,6 +58,8 @@ class AllMvcGeneratorCommand extends Command
 
         foreach ($models as $model) {
             $this->comment("Generate {$model} model class.");
+
+            $model = 'Models/' . $model;
             $this->callSilent('gen:model', [
                 'name' => $model,
                 '--overwrite' => $this->option('overwrite'),

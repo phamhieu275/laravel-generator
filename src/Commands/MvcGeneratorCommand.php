@@ -36,23 +36,23 @@ class MvcGeneratorCommand extends Command
      */
     public function handle()
     {
-        $modelName = $this->argument('model');
+        $model = $this->argument('model');
 
         $this->call('gen:model', [
-            'name' => $modelName,
+            'name' => $model,
             '--overwrite' => $this->option('overwrite'),
         ]);
 
         $this->call('gen:controller', [
-            'name' => $this->getControllerName($modelName),
-            '--model' => config('generator.namespace.model') . '\\' . $modelName,
+            'name' => $this->getControllerName($model),
+            '--model' => $model,
             '--overwrite' => $this->option('overwrite')
         ]);
 
         foreach ($this->getListView($this->option('actions')) as $view) {
             $this->call('gen:view', [
                 'name' => $view,
-                'model' => $modelName,
+                'model' => $model,
                 '--overwrite' => $this->option('overwrite')
             ]);
         }

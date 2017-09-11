@@ -29,12 +29,12 @@ class ModelGeneratorCommandTest extends TestCase
     public function test_create_basic_model()
     {
         $this->artisan('gen:model', [
-            'name' => 'Foo',
+            'name' => 'Models\Foo',
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Models/Foo.php'
         );
     }
 
@@ -44,13 +44,13 @@ class ModelGeneratorCommandTest extends TestCase
     public function test_create_model_with_table_name()
     {
         $this->artisan('gen:model', [
-            'name' => 'Foo',
+            'name' => 'Models\Foo',
             '--table' => 'bar'
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo_custom_table_name.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Models/Foo.php'
         );
     }
 
@@ -60,13 +60,13 @@ class ModelGeneratorCommandTest extends TestCase
     public function test_create_model_with_fillable()
     {
         $this->artisan('gen:model', [
-            'name' => 'Foo',
+            'name' => 'Models\Foo',
             '--fillable' => 'name,content'
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo_custom_fillable.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Models/Foo.php'
         );
     }
 
@@ -76,29 +76,13 @@ class ModelGeneratorCommandTest extends TestCase
     public function test_create_model_use_softdelete()
     {
         $this->artisan('gen:model', [
-            'name' => 'Foo',
+            'name' => 'Models\Foo',
             '--softDelete' => true
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo_use_softdelete.php',
-            $this->outputPath . '/Foo.php'
-        );
-    }
-
-    /**
-     * @group model
-     */
-    public function test_create_model_with_namespace()
-    {
-        $this->artisan('gen:model', [
-            'name' => 'Foo',
-            '--namespace' => 'App\Bar\Models'
-        ]);
-
-        $this->assertFileEquals(
-            $this->expectedPath . '/models/Foo_custom_namespace.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Models/Foo.php'
         );
     }
 
@@ -115,7 +99,7 @@ class ModelGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo_custom_root_namespace.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Sample/Models/Foo.php'
         );
     }
 
@@ -125,12 +109,12 @@ class ModelGeneratorCommandTest extends TestCase
     public function test_create_model_with_existed_table()
     {
         $this->artisan('gen:model', [
-            'name' => 'Bar',
+            'name' => 'Models\Bar',
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Bar.php',
-            $this->outputPath . '/Bar.php'
+            app_path() . '/Models/Bar.php'
         );
     }
 
@@ -140,13 +124,13 @@ class ModelGeneratorCommandTest extends TestCase
     public function test_create_model_and_migration()
     {
         $this->artisan('gen:model', [
-            'name' => 'Bar',
+            'name' => 'Models\Bar',
             '--migration' => true
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Bar.php',
-            $this->outputPath . '/Bar.php'
+            app_path() . '/Models/Bar.php'
         );
 
         preg_match('/[0-9_]*_create_bars_table/', Artisan::output(), $matches);
@@ -154,7 +138,7 @@ class ModelGeneratorCommandTest extends TestCase
         $this->assertCount(1, $matches);
         $this->assertFileEquals(
             $this->expectedPath . '/migrations/create_bars_table.php',
-            $this->outputPath . "/{$matches[0]}.php"
+            database_path('migrations') . "/{$matches[0]}.php"
         );
     }
 
@@ -164,19 +148,19 @@ class ModelGeneratorCommandTest extends TestCase
     public function test_create_model_and_controller()
     {
         $this->artisan('gen:model', [
-            'name' => 'Bar',
+            'name' => 'Models\Bar',
             '--controller' => true,
             '--resource' => true
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Bar.php',
-            $this->outputPath . '/Bar.php'
+            app_path() . '/Models/Bar.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/BarController.php',
-            $this->outputPath . '/BarController.php'
+            app_path() . '/Http/Controllers/BarController.php'
         );
     }
 
@@ -185,15 +169,16 @@ class ModelGeneratorCommandTest extends TestCase
      */
     public function test_create_basic_model_with_overwrite_option()
     {
-        File::put($this->outputPath . '/Foo.php', 'abc');
+        File::makeDirectory(app_path() . '/Models');
+        File::put(app_path() . '/Models/Foo.php', 'abc');
         $this->artisan('gen:model', [
-            'name' => 'Foo',
+            'name' => 'Models\Foo',
             '--overwrite' => true
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Models/Foo.php'
         );
     }
 }

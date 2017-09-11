@@ -31,42 +31,42 @@ class AllMvcGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Bar.php',
-            $this->outputPath . '/Bar.php'
+            app_path() . '/Models/Bar.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/BarController.php',
-            $this->outputPath . '/BarController.php'
+            app_path() . '/Http/Controllers/BarController.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/index.blade.php',
-            $this->outputPath . '/bars/index.blade.php'
+            resource_path('views') . '/bars/index.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/table.blade.php',
-            $this->outputPath . '/bars/table.blade.php'
+            resource_path('views') . '/bars/table.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/form.blade.php',
-            $this->outputPath . '/bars/form.blade.php'
+            resource_path('views') . '/bars/form.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/create.blade.php',
-            $this->outputPath . '/bars/create.blade.php'
+            resource_path('views') . '/bars/create.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/edit.blade.php',
-            $this->outputPath . '/bars/edit.blade.php'
+            resource_path('views') . '/bars/edit.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/show.blade.php',
-            $this->outputPath . '/bars/show.blade.php'
+            resource_path('views') . '/bars/show.blade.php'
         );
     }
 
@@ -82,83 +82,83 @@ class AllMvcGeneratorCommandTest extends TestCase
         // Foo Mvc
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Models/Foo.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/FooController.php',
-            $this->outputPath . '/FooController.php'
+            app_path() . '/Http/Controllers/FooController.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/index.blade.php',
-            $this->outputPath . '/foos/index.blade.php'
+            resource_path('views') . '/foos/index.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/table.blade.php',
-            $this->outputPath . '/foos/table.blade.php'
+            resource_path('views') . '/foos/table.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/form.blade.php',
-            $this->outputPath . '/foos/form.blade.php'
+            resource_path('views') . '/foos/form.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/create.blade.php',
-            $this->outputPath . '/foos/create.blade.php'
+            resource_path('views') . '/foos/create.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/edit.blade.php',
-            $this->outputPath . '/foos/edit.blade.php'
+            resource_path('views') . '/foos/edit.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/show.blade.php',
-            $this->outputPath . '/foos/show.blade.php'
+            resource_path('views') . '/foos/show.blade.php'
         );
 
         // Bar Mvc
         $this->assertFileEquals(
             $this->expectedPath . '/models/Bar.php',
-            $this->outputPath . '/Bar.php'
+            app_path() . '/Models/Bar.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/BarController.php',
-            $this->outputPath . '/BarController.php'
+            app_path() . '/Http/Controllers/BarController.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/index.blade.php',
-            $this->outputPath . '/bars/index.blade.php'
+            resource_path('views') . '/bars/index.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/table.blade.php',
-            $this->outputPath . '/bars/table.blade.php'
+            resource_path('views') . '/bars/table.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/form.blade.php',
-            $this->outputPath . '/bars/form.blade.php'
+            resource_path('views') . '/bars/form.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/create.blade.php',
-            $this->outputPath . '/bars/create.blade.php'
+            resource_path('views') . '/bars/create.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/edit.blade.php',
-            $this->outputPath . '/bars/edit.blade.php'
+            resource_path('views') . '/bars/edit.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/show.blade.php',
-            $this->outputPath . '/bars/show.blade.php'
+            resource_path('views') . '/bars/show.blade.php'
         );
     }
 
@@ -175,69 +175,69 @@ class AllMvcGeneratorCommandTest extends TestCase
         // Foo Mvc
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Models/Foo.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/FooController.php',
-            $this->outputPath . '/FooController.php'
+            app_path() . '/Http/Controllers/FooController.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/index.blade.php',
-            $this->outputPath . '/foos/index.blade.php'
+            resource_path('views') . '/foos/index.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/table.blade.php',
-            $this->outputPath . '/foos/table.blade.php'
+            resource_path('views') . '/foos/table.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/form.blade.php',
-            $this->outputPath . '/foos/form.blade.php'
+            resource_path('views') . '/foos/form.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/foos/create.blade.php',
-            $this->outputPath . '/foos/create.blade.php'
+            resource_path('views') . '/foos/create.blade.php'
         );
 
-        $this->assertFileNotExists($this->outputPath . '/foos/edit.blade.php');
-        $this->assertFileNotExists($this->outputPath . '/foos/show.blade.php');
+        $this->assertFileNotExists(resource_path('views') . '/foos/edit.blade.php');
+        $this->assertFileNotExists(resource_path('views') . '/foos/show.blade.php');
 
         // Bar Mvc
         $this->assertFileEquals(
             $this->expectedPath . '/models/Bar.php',
-            $this->outputPath . '/Bar.php'
+            app_path() . '/Models/Bar.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/BarController.php',
-            $this->outputPath . '/BarController.php'
+            app_path() . '/Http/Controllers/BarController.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/index.blade.php',
-            $this->outputPath . '/bars/index.blade.php'
+            resource_path('views') . '/bars/index.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/table.blade.php',
-            $this->outputPath . '/bars/table.blade.php'
+            resource_path('views') . '/bars/table.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/form.blade.php',
-            $this->outputPath . '/bars/form.blade.php'
+            resource_path('views') . '/bars/form.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/views/bars/create.blade.php',
-            $this->outputPath . '/bars/create.blade.php'
+            resource_path('views') . '/bars/create.blade.php'
         );
 
-        $this->assertFileNotExists($this->outputPath . '/bars/edit.blade.php');
-        $this->assertFileNotExists($this->outputPath . '/bars/show.blade.php');
+        $this->assertFileNotExists(resource_path('views') . '/bars/edit.blade.php');
+        $this->assertFileNotExists(resource_path('views') . '/bars/show.blade.php');
     }
 }

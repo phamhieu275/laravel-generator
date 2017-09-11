@@ -30,39 +30,14 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
         $templatePath = $this->getTemplatePath();
 
         if ($this->option('model')) {
-            return $templatePath . '/controller.model.stub';
+            if ($this->option('api')) {
+                return $templatePath . '/controller.api.stub';
+            } else {
+                return $templatePath . '/controller.model.stub';
+            }
         }
 
         return $templatePath . '/' . basename(parent::getStub());
-    }
-
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        if ($this->option('namespace')) {
-            return trim($this->option('namespace'));
-        }
-
-        return config('generator.namespace.controller');
-    }
-
-    /**
-     * Get the root namespace for the class.
-     *
-     * @return string
-     */
-    protected function rootNamespace()
-    {
-        if ($this->option('rootNamespace')) {
-            return trim($this->option('rootNamespace'));
-        }
-
-        return parent::rootNamespace();
     }
 
     /**
@@ -109,13 +84,13 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
         }
 
         if ($this->option('package')) {
-            $rootNamespace = trim($this->option('rootNamespace')) . '\Models';
+            $rootNamespace = trim($this->option('rootNamespace')) . '\\Models\\';
         } else {
-            $rootNamespace = config('generator.namespace.model');
+            $rootNamespace = $this->laravel->getNamespace();
         }
 
         if (! starts_with($model, $rootNamespace)) {
-            $model = $rootNamespace . '\\' . $model;
+            $model = $rootNamespace . $model;
         }
 
         return $model;
@@ -129,6 +104,8 @@ class ControllerGeneratorCommand extends ControllerMakeCommand
     protected function getOptions()
     {
         return array_merge(parent::getOptions(), [
+            ['api', null, InputOption::VALUE_NONE, 'Generate a api controller class.'],
+
             ['overwrite', null, InputOption::VALUE_NONE, 'Force overwriting existing files'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The location where the model file should be created'],

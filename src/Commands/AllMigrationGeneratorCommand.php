@@ -72,10 +72,10 @@ class AllMigrationGeneratorCommand extends Command
     protected function getMigrationPath()
     {
         if (! is_null($targetPath = $this->input->getOption('path'))) {
-            return $this->laravel->basePath().'/'.$targetPath;
+            return base_path() . DIRECTORY_SEPARATOR . $targetPath;
         }
 
-        return config('generator.path.migration');
+        return database_path('migrations');
     }
 
     /**

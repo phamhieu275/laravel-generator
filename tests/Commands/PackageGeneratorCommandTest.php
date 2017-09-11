@@ -3,6 +3,7 @@
 namespace Bluecode\Generator\Tests\Commands;
 
 use Artisan;
+use Config;
 use DB;
 use File;
 use Bluecode\Generator\Tests\TestCase;
@@ -13,6 +14,9 @@ class PackageGeneratorCommandTest extends TestCase
     {
         parent::setUp();
 
+        $this->packagePath = base_path();
+        Config::set('generator.path.package', $this->packagePath);
+        
         DB::unprepared(File::get(__DIR__ . '/../sql/create_bars_table.sql'));
     }
 
@@ -34,16 +38,16 @@ class PackageGeneratorCommandTest extends TestCase
             '--no-interaction' => true
         ]);
 
-        $this->assertDirectoryExists($this->outputPath . '/sample_vendor/sample_package');
+        $this->assertDirectoryExists($this->packagePath . '/sample_vendor/sample_package');
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/composer.json',
-            $this->outputPath . '/sample_vendor/sample_package/composer.json'
+            $this->packagePath . '/sample_vendor/sample_package/composer.json'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/SamplePackagePackageProvider_plain.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/SamplePackagePackageProvider.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/SamplePackagePackageProvider.php'
         );
     }
 
@@ -59,61 +63,61 @@ class PackageGeneratorCommandTest extends TestCase
             '--no-interaction' => true
         ]);
 
-        $this->assertDirectoryExists($this->outputPath . '/sample_vendor/sample_package');
+        $this->assertDirectoryExists($this->packagePath . '/sample_vendor/sample_package');
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/composer.json',
-            $this->outputPath . '/sample_vendor/sample_package/composer.json'
+            $this->packagePath . '/sample_vendor/sample_package/composer.json'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/SamplePackagePackageProvider.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/SamplePackagePackageProvider.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/SamplePackagePackageProvider.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/routes.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/routes.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/routes.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/Models/Bar.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/Models/Bar.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/Models/Bar.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/Http/Controllers/BarController.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/Http/Controllers/BarController.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/Http/Controllers/BarController.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/resources/views/bars/index.blade.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/index.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/index.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/resources/views/bars/table.blade.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/table.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/table.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/resources/views/bars/create.blade.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/create.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/create.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/resources/views/bars/edit.blade.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/edit.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/edit.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/resources/views/bars/form.blade.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/form.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/form.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/resources/views/bars/show.blade.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/show.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/show.blade.php'
         );
     }
 
@@ -130,57 +134,57 @@ class PackageGeneratorCommandTest extends TestCase
             '--no-interaction' => true
         ]);
 
-        $this->assertDirectoryExists($this->outputPath . '/sample_vendor/sample_package');
+        $this->assertDirectoryExists($this->packagePath . '/sample_vendor/sample_package');
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/composer.json',
-            $this->outputPath . '/sample_vendor/sample_package/composer.json'
+            $this->packagePath . '/sample_vendor/sample_package/composer.json'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/SamplePackagePackageProvider.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/SamplePackagePackageProvider.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/SamplePackagePackageProvider.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/routes.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/routes.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/routes.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/Models/Bar.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/Models/Bar.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/Models/Bar.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/Http/Controllers/BarController.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/Http/Controllers/BarController.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/Http/Controllers/BarController.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/resources/views/bars/index.blade.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/index.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/index.blade.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/resources/views/bars/table.blade.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/table.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/table.blade.php'
         );
 
         $this->assertFileNotExists(
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/create.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/create.blade.php'
         );
 
         $this->assertFileNotExists(
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/edit.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/edit.blade.php'
         );
 
         $this->assertFileNotExists(
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/form.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/form.blade.php'
         );
 
         $this->assertFileNotExists(
-            $this->outputPath . '/sample_vendor/sample_package/src/resources/views/bars/show.blade.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/resources/views/bars/show.blade.php'
         );
     }
 
@@ -196,16 +200,16 @@ class PackageGeneratorCommandTest extends TestCase
             '--no-interaction' => true
         ]);
 
-        $this->assertDirectoryExists($this->outputPath . '/vendor/module');
+        $this->assertDirectoryExists($this->packagePath . '/vendor/module');
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/composer.json',
-            $this->outputPath . '/vendor/module/composer.json'
+            $this->packagePath . '/vendor/module/composer.json'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/SamplePackagePackageProvider_plain.php',
-            $this->outputPath . '/vendor/module/src/SamplePackagePackageProvider.php'
+            $this->packagePath . '/vendor/module/src/SamplePackagePackageProvider.php'
         );
     }
 
@@ -214,8 +218,8 @@ class PackageGeneratorCommandTest extends TestCase
      */
     public function test_create_package_and_not_update_composer_file()
     {
-        File::makeDirectory($this->outputPath . '/sample_vendor/sample_package', '0755', true);
-        File::put($this->outputPath . '/sample_vendor/sample_package/composer.json', 'Package composer');
+        File::makeDirectory($this->packagePath . '/sample_vendor/sample_package', '0755', true);
+        File::put($this->packagePath . '/sample_vendor/sample_package/composer.json', 'Package composer');
 
         $this->artisan('gen:package', [
             'vendor' => 'SampleVendor',
@@ -224,7 +228,7 @@ class PackageGeneratorCommandTest extends TestCase
         ]);
 
         $this->assertStringEqualsFile(
-            $this->outputPath . '/sample_vendor/sample_package/composer.json',
+            $this->packagePath . '/sample_vendor/sample_package/composer.json',
             'Package composer'
         );
     }
@@ -234,8 +238,8 @@ class PackageGeneratorCommandTest extends TestCase
      */
     public function test_create_package_and_append_into_route_file()
     {
-        File::makeDirectory($this->outputPath . '/sample_vendor/sample_package/src', '0755', true);
-        File::put($this->outputPath . '/sample_vendor/sample_package/src/routes.php', "<?php\n");
+        File::makeDirectory($this->packagePath . '/sample_vendor/sample_package/src', '0755', true);
+        File::put($this->packagePath . '/sample_vendor/sample_package/src/routes.php', "<?php\n");
 
         $this->artisan('gen:package', [
             'vendor' => 'SampleVendor',
@@ -246,7 +250,7 @@ class PackageGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/routes.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/routes.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/routes.php'
         );
     }
 
@@ -255,10 +259,10 @@ class PackageGeneratorCommandTest extends TestCase
      */
     public function test_create_package_and_not_update_route_file()
     {
-        File::makeDirectory($this->outputPath . '/sample_vendor/sample_package/src', '0755', true);
+        File::makeDirectory($this->packagePath . '/sample_vendor/sample_package/src', '0755', true);
         File::copy(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/routes.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/routes.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/routes.php'
         );
 
         $this->artisan('gen:package', [
@@ -270,7 +274,7 @@ class PackageGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/packages/sample_vendor/sample_package/src/routes.php',
-            $this->outputPath . '/sample_vendor/sample_package/src/routes.php'
+            $this->packagePath . '/sample_vendor/sample_package/src/routes.php'
         );
     }
 }
