@@ -26,7 +26,7 @@ class MigrationGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/migrations/create_bars_table.php',
-            $this->outputPath . "/{$filename}.php"
+            database_path('migrations') . "/{$filename}.php"
         );
 
         DB::statement('DROP TABLE IF EXISTS `bars`');
@@ -49,7 +49,7 @@ class MigrationGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/migrations/create_hoges_table.php',
-            $this->outputPath . "/{$filename}.php"
+            database_path('migrations') . "/{$filename}.php"
         );
 
         DB::statement('DROP TABLE IF EXISTS `hoges`');

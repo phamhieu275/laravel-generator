@@ -4,6 +4,7 @@ namespace Bluecode\Generator\Commands;
 
 use Illuminate\Support\Composer;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Database\Migrations\MigrationCreator as BaseMigrationCreator;
 use Bluecode\Generator\Creator\MigrationCreator;
 
 class MigrationGeneratorCommand extends MigrateMakeCommand
@@ -27,22 +28,9 @@ class MigrationGeneratorCommand extends MigrateMakeCommand
      * @param \Illuminate\Support\Composer $composer The composer
      * @return void
      */
-    public function __construct(MigrationCreator $creator, Composer $composer)
+    public function __construct(BaseMigrationCreator $baseCreator, Composer $composer, MigrationCreator $creator)
     {
-        parent::__construct($creator, $composer);
-    }
-
-    /**
-     * Get migration path (either specified by '--path' option or default location).
-     *
-     * @return string
-     */
-    protected function getMigrationPath()
-    {
-        if ($this->option('path')) {
-            return parent::getMigrationPath();
-        }
-
-        return config('generator.path.migration');
+        parent::__construct($baseCreator, $composer);
+        $this->creator = $creator;
     }
 }

@@ -27,22 +27,44 @@ trait GeneratorCommandTrait
      */
     public function getPath($name)
     {
-        if ($this->hasOption('path') && $this->option('path')) {
-            if ($this->hasOption('package') && $this->option('package')) {
-                $basePath = config('generator.path.package');
-            } else {
-                $basePath =  $this->laravel['path'];
-            }
-            
-            return $basePath . '/'. trim($this->option('path')) . DIRECTORY_SEPARATOR . class_basename($name) . '.php';
+        if ($this->hasOption('path')
+            && $this->option('path')
+            && $this->hasOption('package')
+            && $this->option('package')) {
+            $packagePath = config('generator.path.package');
+
+            return $packagePath . '/' . trim($this->option('path'), '/') . '/' . class_basename($name) . '.php';
         }
 
-        $path = config('generator.path.' . strtolower($this->type));
+        return parent::getPath($name);
+    }
 
-        if ($path) {
-            return $path . DIRECTORY_SEPARATOR . class_basename($name) . '.php';
+    /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    public function getDefaultNamespace($rootNamespace)
+    {
+        if ($this->hasOption('namespace') && $this->option('namespace')) {
+            return trim($this->option('namespace'));
         }
 
-        return parent::getPath();
+        return parent::getDefaultNamespace($rootNamespace);
+    }
+
+    /**
+     * Get the root namespace for the class.
+     *
+     * @return string
+     */
+    public function rootNamespace()
+    {
+        if ($this->hasOption('rootNamespace') && $this->option('rootNamespace')) {
+            return $this->option('rootNamespace');
+        }
+
+        return parent::rootNamespace();
     }
 }

@@ -13,12 +13,12 @@ class ControllerGeneratorCommandTest extends TestCase
     {
         $this->artisan('gen:controller', [
             'name' => 'FooController',
-            '--model' => 'Foo',
+            '--model' => 'Models\Foo',
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/FooController.php',
-            $this->outputPath . '/FooController.php'
+            app_path() . '/Http/Controllers/FooController.php'
         );
     }
 
@@ -29,13 +29,13 @@ class ControllerGeneratorCommandTest extends TestCase
     {
         $this->artisan('gen:controller', [
             'name' => 'FooController',
-            '--model' => 'Foo',
+            '--model' => 'Models\Foo',
             '--namespace' => 'App\Http\Controllers\Bar',
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/FooController_custom_namespace.php',
-            $this->outputPath . '/FooController.php'
+            app_path() . '/Http/Controllers/Bar/FooController.php'
         );
     }
 
@@ -46,14 +46,14 @@ class ControllerGeneratorCommandTest extends TestCase
     {
         $this->artisan('gen:controller', [
             'name' => 'FooController',
-            '--model' => 'Foo',
+            '--model' => 'Models\Foo',
             '--rootNamespace' => 'Test\Sample',
             '--namespace' => 'Test\Sample\Http\Controllers',
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/FooController_custom_root_namespace.php',
-            $this->outputPath . '/FooController.php'
+            app_path() . '/Http/Controllers/FooController.php'
         );
     }
 
@@ -64,13 +64,13 @@ class ControllerGeneratorCommandTest extends TestCase
     {
         $this->artisan('gen:controller', [
             'name' => 'FooController',
-            '--model' => 'Foo',
+            '--model' => 'Models\Foo',
             '--routePrefix' => 'bar',
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/FooController_route_prefix.php',
-            $this->outputPath . '/FooController.php'
+            app_path() . '/Http/Controllers/FooController.php'
         );
     }
 
@@ -85,7 +85,7 @@ class ControllerGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/controllers/FooController_plain.php',
-            $this->outputPath . '/FooController.php'
+            app_path() . '/Http/Controllers/FooController.php'
         );
     }
 }

@@ -50,6 +50,12 @@ class GeneratorServiceProvider extends ServiceProvider
                 Commands\AllModelGeneratorCommand::class,
                 Commands\AllMvcGeneratorCommand::class,
             ]);
+
+            if ($this->app->version() >= '5.5') {
+                $this->commands([
+                    Commands\ResourceGeneratorCommand::class,
+                ]);
+            }
         }
     }
 }

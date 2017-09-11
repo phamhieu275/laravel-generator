@@ -30,16 +30,18 @@ class AllModelGeneratorCommandTest extends TestCase
      */
     public function test_create_many_model()
     {
-        $this->artisan('gen:all:model');
+        $this->artisan('gen:all:model', [
+            '--path' => 'Models'
+        ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Bar.php',
-            $this->outputPath . '/Bar.php'
+            app_path() . '/Models/Bar.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Baz.php',
-            $this->outputPath . '/Baz.php'
+            app_path() . '/Models/Baz.php'
         );
     }
 
@@ -49,17 +51,18 @@ class AllModelGeneratorCommandTest extends TestCase
     public function test_create_many_model_with_only_option()
     {
         $this->artisan('gen:all:model', [
-            '--only' => 'Foo,Bar'
+            '--only' => 'Foo,Bar',
+            '--path' => 'Models'
         ]);
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Foo.php',
-            $this->outputPath . '/Foo.php'
+            app_path() . '/Models/Foo.php'
         );
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Bar.php',
-            $this->outputPath . '/Bar.php'
+            app_path() . '/Models/Bar.php'
         );
     }
 
@@ -69,14 +72,15 @@ class AllModelGeneratorCommandTest extends TestCase
     public function test_create_many_model_with_exclude_option()
     {
         $this->artisan('gen:all:model', [
-            '--exclude' => 'Bar'
+            '--exclude' => 'Bar',
+            '--path' => 'Models'
         ]);
 
         $this->assertFileNotExists($this->outputPath . '/Bar.php');
 
         $this->assertFileEquals(
             $this->expectedPath . '/models/Baz.php',
-            $this->outputPath . '/Baz.php'
+            app_path() . '/Models/Baz.php'
         );
     }
 }

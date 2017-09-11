@@ -85,35 +85,6 @@ class ModelGeneratorCommand extends ModelMakeCommand
     }
 
     /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        if ($this->option('namespace')) {
-            return trim($this->option('namespace'));
-        }
-
-        return config('generator.namespace.model');
-    }
-
-    /**
-     * Get the root namespace for the class.
-     *
-     * @return string
-     */
-    protected function rootNamespace()
-    {
-        if ($this->option('rootNamespace')) {
-            return trim($this->option('rootNamespace'));
-        }
-
-        return parent::rootNamespace();
-    }
-
-    /**
      * Build the class with the given name.
      *
      * @param  string  $name

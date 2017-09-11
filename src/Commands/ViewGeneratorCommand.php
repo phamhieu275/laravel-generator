@@ -61,7 +61,10 @@ class ViewGeneratorCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->getTemplatePath() . '/views/' . $this->argument('name') . '.blade.stub';
+        $name = $this->argument('name');
+        $templatePath = $this->getTemplatePath();
+        
+        return $templatePath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $name . '.blade.stub';
     }
 
     /**
@@ -106,19 +109,19 @@ class ViewGeneratorCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
+        $basePath = resource_path('views');
+
         if ($this->option('path')) {
             if ($this->option('package')) {
                 $basePath = config('generator.path.package');
-            } else {
-                $basePath = $this->laravel['path'];
             }
 
-            return $basePath . '/' . trim($this->option('path')) . '/' . "{$name}.blade.php";
+            $basePath .= DIRECTORY_SEPARATOR . trim($this->option('path'), DIRECTORY_SEPARATOR);
         }
 
-        $viewFolderName = $this->getViewNamespace($this->argument('model'));
+        $viewFolderName = $this->getViewNamespace(class_basename($this->argument('model')));
 
-        return config('generator.path.view') . '/' . $viewFolderName . '/' . "{$name}.blade.php";
+        return $basePath . DIRECTORY_SEPARATOR . $viewFolderName . DIRECTORY_SEPARATOR . "{$name}.blade.php";
     }
 
     /**
@@ -130,7 +133,7 @@ class ViewGeneratorCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         $stub = $this->files->get($this->getStub());
-        $modelName = $this->argument('model');
+        $modelName = class_basename($this->argument('model'));
 
         $replaces = [
             'DummyMainLayout' => config('generator.view.layout'),
@@ -194,7 +197,9 @@ class ViewGeneratorCommand extends GeneratorCommand
      */
     private function buildFormInputs($fields)
     {
-        $fieldTemplate = $this->files->get($this->getTemplatePath() . '/views/form_field.blade.stub');
+        $templatePath = $this->getTemplatePath();
+        $formFieldPath = $templatePath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'form_field.blade.stub';
+        $fieldTemplate = $this->files->get($formFieldPath);
 
         $inputs = [];
         $placeholders = [
@@ -246,7 +251,9 @@ class ViewGeneratorCommand extends GeneratorCommand
      */
     private function buildShowFields($fields, $modelVariable)
     {
-        $fieldTemplate = $this->files->get($this->getTemplatePath() . '/views/show_field.blade.stub');
+        $templatePath = $this->getTemplatePath();
+        $showFieldPath = $templatePath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'show_field.blade.stub';
+        $fieldTemplate = $this->files->get($showFieldPath);
 
         $placeholders = [
             'DummyFieldName',

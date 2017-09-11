@@ -29,51 +29,22 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
     {
         $templatePath = $this->getTemplatePath();
 
-        if ($this->option('model')) {
-            return $templatePath . '/package/provider.model.stub';
+        if ($this->usePackageProviderTemplate()) {
+            return $templatePath . '/package/provider.stub';
         }
 
         return $templatePath . '/provider.stub';
     }
 
     /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        if ($this->option('package')) {
-            return $rootNamespace;
-        }
-
-        return parent::getDefaultNamespace($rootNamespace);
-    }
-
-    /**
-     * Get the root namespace for the class.
-     *
-     * @return string
-     */
-    protected function rootNamespace()
-    {
-        if ($this->option('rootNamespace')) {
-            return $this->option('rootNamespace');
-        }
-
-        return parent::rootNamespace();
-    }
-
-    /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
      * @return string
      */
     protected function buildClass($name)
     {
-        if ($this->option('package') && $this->option('model')) {
+        if ($this->usePackageProviderTemplate()) {
             $replaces = [
                 'DummyControllerNamespace' => $this->rootNamespace() . '\Http\Controllers',
                 'DummyPackage' => $this->getPackageViewNamespace($this->option('package')),
@@ -83,6 +54,16 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
         }
 
         return parent::buildClass($name);
+    }
+
+    /**
+     * check whether to use package provider template
+     *
+     * @return boolean
+     */
+    private function usePackageProviderTemplate()
+    {
+        return $this->option('package') && ! $this->option('plain');
     }
 
     /**
@@ -97,11 +78,13 @@ class ProviderGeneratorCommand extends ProviderMakeCommand
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The location where the model file should be created'],
 
+            ['namespace', null, InputOption::VALUE_OPTIONAL, 'The namespace of the model'],
+
             ['rootNamespace', null, InputOption::VALUE_OPTIONAL, 'The root namespace of the model'],
 
             ['package', null, InputOption::VALUE_OPTIONAL, 'The package name which the model is created'],
 
-            ['model', null, InputOption::VALUE_NONE, 'Generate the provider for the given model'],
+            ['plain', null, InputOption::VALUE_NONE, 'Generate the plain provider'],
         ]);
     }
 }

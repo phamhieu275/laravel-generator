@@ -17,7 +17,7 @@ class ProviderGeneratorCommandTest extends TestCase
 
         $this->assertFileEquals(
             $this->expectedPath . '/providers/FooProvider.php',
-            $this->outputPath . '/FooProvider.php'
+            app_path() . '/Providers/FooProvider.php'
         );
     }
 }

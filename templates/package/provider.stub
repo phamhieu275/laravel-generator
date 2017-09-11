@@ -2,6 +2,7 @@
 
 namespace DummyNamespace;
 
+use Route;
 use Illuminate\Support\ServiceProvider;
 
 class DummyClass extends ServiceProvider

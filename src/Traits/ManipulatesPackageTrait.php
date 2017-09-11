@@ -21,13 +21,7 @@ trait ManipulatesPackageTrait
             return;
         }
 
-        if (! File::makeDirectory($packagePath, 0755, true)) {
-            throw new RuntimeException('Cannot create package folder');
-        }
-
-        if (! File::exists($packagePath . '/src')) {
-            File::makeDirectory($packagePath . '/src', 0755, true);
-        }
+        File::makeDirectory($packagePath . '/src', 0755, true);
 
         $this->info('Package folder created successfully.');
     }

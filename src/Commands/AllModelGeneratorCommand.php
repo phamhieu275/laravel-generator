@@ -19,6 +19,7 @@ class AllModelGeneratorCommand extends Command
         {--overwrite : Force overwriting existing files}
         {--o|only= : The only model list to generate}
         {--e|exclude= : The exclude model list to not generate}
+        {--p|path= : The location where models is generated}
     ';
 
      /**
@@ -49,10 +50,11 @@ class AllModelGeneratorCommand extends Command
     {
         $models = $this->getListModel();
 
+        $path = $this->option('path') ? rtrim(trim($this->option('path')), '/') . '/' : '';
         foreach ($models as $model) {
             $this->comment("Generate {$model} model class.");
             $this->callSilent('gen:model', [
-                'name' => $model,
+                'name' => $path . $model,
                 '--overwrite' => $this->option('overwrite'),
             ]);
         }

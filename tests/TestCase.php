@@ -2,10 +2,8 @@
 
 namespace Bluecode\Generator\Tests;
 
-use Config;
 use File;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-// use PHPUnit\Framework\TestCase as BaseTestCase;
 use Illuminate\Contracts\Console\Kernel;
 
 class TestCase extends BaseTestCase
@@ -22,7 +20,7 @@ class TestCase extends BaseTestCase
      *
      * @var string
      */
-    public $outputPath = __DIR__ . DIRECTORY_SEPARATOR . 'output';
+    public $outputPath = __DIR__ . DIRECTORY_SEPARATOR . 'output' . DIRECTORY_SEPARATOR;
 
     /**
      * Creates the application.
@@ -35,6 +33,8 @@ class TestCase extends BaseTestCase
 
         $app->make(Kernel::class)->bootstrap();
 
+        $app->setBasePath(__DIR__ . DIRECTORY_SEPARATOR . 'output');
+
         return $app;
     }
 
@@ -42,11 +42,14 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        if (! File::exists($this->outputPath)) {
-            File::makeDirectory($this->outputPath);
-        }
+        File::copy(
+            __DIR__ . DIRECTORY_SEPARATOR . 'composer.json',
+            $this->outputPath . DIRECTORY_SEPARATOR . 'composer.json'
+        );
 
-        $this->setConfig();
+        File::makeDirectory(app_path());
+        File::makeDirectory(database_path('migrations'), '0755', true);
+        File::makeDirectory(resource_path('views'), '0755', true);
     }
 
     public function tearDown()
@@ -54,20 +57,5 @@ class TestCase extends BaseTestCase
         parent::tearDown();
 
         File::cleanDirectory($this->outputPath);
-    }
-
-    /**
-     * Set the temporary configuration
-     *
-     * @return void
-     */
-    public function setConfig()
-    {
-        Config::set('generator.path.migration', $this->outputPath);
-        Config::set('generator.path.model', $this->outputPath);
-        Config::set('generator.path.controller', $this->outputPath);
-        Config::set('generator.path.view', $this->outputPath);
-        Config::set('generator.path.provider', $this->outputPath);
-        Config::set('generator.path.package', $this->outputPath);
     }
 }

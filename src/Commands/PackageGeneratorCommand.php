@@ -13,7 +13,6 @@ use Bluecode\Generator\Traits\ActionViewTrait;
 class PackageGeneratorCommand extends Command
 {
     use ManipulatesPackageTrait;
-    use InteractsWithUserTrait;
     use TemplateTrait;
     use ActionViewTrait;
 
@@ -60,8 +59,8 @@ class PackageGeneratorCommand extends Command
      */
     public function handle()
     {
-        $vendorName = $this->getVendor();
-        $packageName = $this->getPackage();
+        $vendorName = $this->argument('vendor');
+        $packageName = $this->argument('package');
 
         $relativePath = $this->getRelativePath($vendorName, $packageName);
 
@@ -84,7 +83,7 @@ class PackageGeneratorCommand extends Command
     }
 
     /**
-     * Gets the relative path.
+     * Get the relative path.
      *
      * @param string $vendorName The vendor name
      * @param string $packageName The package name
@@ -100,6 +99,28 @@ class PackageGeneratorCommand extends Command
         $packageFolderName = $this->getPackageFolderName($packageName);
 
         return "{$vendorFolderName}/{$packageFolderName}";
+    }
+
+    /**
+     * Get vendor folder name.
+     *
+     * @param string $vendor
+     * @return string
+     */
+    protected function getVendorFolderName($vendor)
+    {
+        return snake_case($vendor);
+    }
+
+    /**
+     * Get package folder name.
+     *
+     * @param string $package
+     * @return string
+     */
+    protected function getPackageFolderName($package)
+    {
+        return snake_case($package);
     }
 
     /**
@@ -166,13 +187,14 @@ class PackageGeneratorCommand extends Command
     {
         $arguments = [
             'name' => studly_case($packageName) . 'PackageProvider',
+            '--namespace' => $rootNamespace,
             '--rootNamespace' => $rootNamespace,
             '--path' => "{$relativePath}/src",
             '--package' => $packageName
         ];
 
-        if ($this->option('model')) {
-            $arguments['--model'] = true;
+        if (! $this->option('model')) {
+            $arguments['--plain'] = true;
         }
 
         $this->call('gen:provider', $arguments);
@@ -220,7 +242,7 @@ class PackageGeneratorCommand extends Command
             $this->call('gen:view', [
                 'name' => $view,
                 'model' => $modelName,
-                '--path' =>  "{$relativePath}/src/resources/views/{$viewFolderName}",
+                '--path' =>  "{$relativePath}/src/resources/views",
                 '--package' => $packageName
             ]);
         }

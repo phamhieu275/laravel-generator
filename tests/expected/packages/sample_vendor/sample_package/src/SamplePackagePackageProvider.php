@@ -2,6 +2,7 @@
 
 namespace SampleVendor\SamplePackage;
 
+use Route;
 use Illuminate\Support\ServiceProvider;
 
 class SamplePackagePackageProvider extends ServiceProvider
