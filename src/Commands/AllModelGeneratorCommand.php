@@ -27,7 +27,7 @@ class AllModelGeneratorCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Generate many model class.';
+    protected $description = 'Create many model class.';
 
     /**
      * Create new console command

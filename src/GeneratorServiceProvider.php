@@ -54,6 +54,7 @@ class GeneratorServiceProvider extends ServiceProvider
             if ($this->app->version() >= '5.5') {
                 $this->commands([
                     Commands\ResourceGeneratorCommand::class,
+                    Commands\ApiGeneratorCommand::class,
                 ]);
             }
         }

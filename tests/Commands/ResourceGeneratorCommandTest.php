@@ -2,7 +2,6 @@
 
 namespace Bluecode\Generator\Tests\Commands;
 
-use Artisan;
 use DB;
 use File;
 use Bluecode\Generator\Tests\TestCase;
