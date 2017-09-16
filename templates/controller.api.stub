@@ -68,6 +68,6 @@ class DummyClass extends Controller
     {
         $DummyModelVariable->delete();
 
-        return json('Deleted successfully');
+        return response()->json('Deleted successfully');
     }
 }

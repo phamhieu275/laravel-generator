@@ -2,7 +2,6 @@
 
 namespace Bluecode\Generator\Tests\Commands;
 
-use Artisan;
 use Config;
 use DB;
 use File;

@@ -9,7 +9,7 @@ use Bluecode\Generator\Tests\TestCase;
 class MvcGeneratorCommandTest extends TestCase
 {
     /**
-     * @group mvc1
+     * @group mvc
      */
     public function test_create_basic_mvc()
     {

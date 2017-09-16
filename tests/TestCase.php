@@ -42,6 +42,10 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        if (! File::exists($this->outputPath)) {
+            File::makeDirectory($this->outputPath);
+        }
+
         File::copy(
             __DIR__ . DIRECTORY_SEPARATOR . 'composer.json',
             $this->outputPath . DIRECTORY_SEPARATOR . 'composer.json'
